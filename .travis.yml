@@ -1,7 +1,7 @@
 dist: xenial
 sudo: required
 
-language: ruby
+language: bash
 
 services:
   - docker
