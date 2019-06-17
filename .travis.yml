@@ -73,7 +73,7 @@ jobs:
         - docker tag "$IMAGE_BASE" "$IMAGE_BRANCH"
         #- docker tag "${IMAGE_BASE}" "${IMAGE_BASE}:${git_sha}-develop"
       script:
-        - docker build -t "$IMAGE_BASE" . #--file "Dockerfile-${VARIANT}"
+        - docker -D build -t "$IMAGE_BASE" . #--file "Dockerfile-${VARIANT}"
         #- ~/official-images/test/run.sh "$IMAGE_TAG"
       after_script:
         - docker images
