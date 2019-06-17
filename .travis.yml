@@ -70,16 +70,17 @@ jobs:
       before_deploy:
         #- TRAVIS_TAG=build-$TRAVIS_BUILD_NUMBER
         #- git_sha="$(git rev-parse --short HEAD)"
-        - docker tag "$IMAGE_BASE" "$IMAGE_BRANCH"
+        - docker tag "$IMAGE_TAG" "$IMAGE_BRANCH"
         #- docker tag "${IMAGE_BASE}" "${IMAGE_BASE}:${git_sha}-develop"
       script:
-        - travis_wait 60 docker -D build -t "$IMAGE_BASE" . #--file "Dockerfile-${VARIANT}"
-        #- ~/official-images/test/run.sh "$IMAGE_TAG"
+        #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
+        - travis_retry docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
+        - travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
       after_script:
         - docker images
       deploy:
         provider: script
-        script: docker push "$IMAGE_BASE:$IMAGE_BRANCH" #&& docker push "${IMAGE_NAME}:${git_sha}-develop"
+        script: docker push "$IMAGE_BRANCH" #&& docker push "${IMAGE_NAME}:${git_sha}-develop"
         on:
           branch: develop
 
