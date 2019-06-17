@@ -1,5 +1,6 @@
 dist: xenial
 sudo: required
+language: ruby
 
 python:
   - '3.6'
@@ -33,6 +34,8 @@ before_install:
   # Update all git submodule (No need this manual submodule update ...)
   ##- git submodule init && git submodule update --init --recursive --remote --merge
 
+  - echo "$DOCKER_PASSWORD" >> ~/credentials
+
 # Install any required components
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
@@ -45,7 +48,8 @@ before_script:
   - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-$VARIANT-${TRAVIS_BRANCH}"
 
   # Making sure we login ...
-  - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+  #- docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+  - cat ~/credentials | docker login --username "$DOCKER_USER" --password-stdin
 
 # When successfully built
 after_success:
