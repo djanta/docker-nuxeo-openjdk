@@ -16,6 +16,7 @@ ENV GOSU_VERSION 1.10
 #=====================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+# Activate the debug option
 RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
 	# install gpg tools
