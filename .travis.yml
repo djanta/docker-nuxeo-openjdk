@@ -1,12 +1,13 @@
 dist: xenial
-sudo: false
+sudo: required
+
 language: ruby
 
 services:
   - docker
 
-cache:
-  directories:
+#cache:
+#  directories:
 #    - $HOME/.m2
 
 env:
