@@ -74,8 +74,8 @@ jobs:
         #- docker tag "${IMAGE_BASE}" "${IMAGE_BASE}:${git_sha}-develop"
       script:
         #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-        - travis_retry docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-        - travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
+        - docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
+        #- travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
       after_script:
         - docker images
       deploy:
