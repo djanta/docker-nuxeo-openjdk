@@ -40,8 +40,8 @@ before_install:
   ##- git submodule init && git submodule update --init --recursive --remote --merge
 
 # Install any required components
-install:
-  - git clone https://github.com/docker-library/official-images.git ~/official-images
+#install:
+#  - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
   - env | sort
@@ -52,10 +52,6 @@ before_script:
 
   # Making sure we login ...
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
-
-# When successfully built
-after_success:
-  - echo "Running after success ..."
 
 stages:
   - name: develop
@@ -76,7 +72,7 @@ jobs:
       script:
         #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
         - docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-        - travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
+        #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
       after_script:
         - docker images
       deploy:

@@ -2,8 +2,8 @@ FROM openjdk:8-jdk
 
 MAINTAINER DJANTA, LLC <team.docker@djanta.io>
 
-LABEL description=""
-LABEL version=""
+LABEL description="OpenJDK and Nuxeo preset tools build together and share across all over any Nuxeo specific distribution"
+LABEL version="0.0-SNAPSHOT"
 
 ARG DEBIAN_FRONTEND
 
@@ -24,6 +24,7 @@ RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
 	# install gpg tools
 	gnupg2 dirmngr \
+
 	# Install all nuxeo required tools
 	perl imagemagick pwgen ffmpeg2theora ffmpeg ufraw x264 \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
