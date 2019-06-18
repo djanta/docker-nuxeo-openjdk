@@ -2,6 +2,9 @@ FROM openjdk:8-jdk
 
 MAINTAINER DJANTA, LLC <team.docker@djanta.io>
 
+LABEL description=""
+LABEL version=""
+
 ARG DEBIAN_FRONTEND
 
 ENV DEBIAN_FRONTEND noninteractive

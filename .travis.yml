@@ -17,14 +17,14 @@ branches:
   - develop
   - release
 
-#env:
-#  - VERSION=8 VARIANT=jdk
-#  - VERSION=9 VARIANT=jdk
+#jdk:
+#  - 8
+#  - 9
 
-matrix:
-  include:
-    - env: VERSION=8 VARIANT=jdk
-    - env: VERSION=9 VARIANT=jdk
+env:
+  matrix:
+    - VERSION=8 VARIANT=jdk
+    - VERSION=9 VARIANT=jdk
 
 # before install any component
 before_install:
@@ -57,11 +57,19 @@ before_script:
 after_success:
   - echo "Running after success ..."
 
+stages:
+  - name: develop
+    if: (branch = develop AND type != pull_request) AND commit_message !~ /^(prepare release ([0-9\.]+))$/
+  - name: snapshot
+    if: branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
+  - name: release
+    if: tag =~ /^[0-9\.]+$/
+
 jobs:
   include:
     - stage: develop
       name: "Build and Unit Testing the develop & PR branch"
-      if: (branch = develop AND type != pull_request) AND commit_message !~ /^(prepare release ([0-9\.]+))$/
+      #if: (branch = develop AND type != pull_request) AND commit_message !~ /^(prepare release ([0-9\.]+))$/
       install: true
       before_deploy:
         - docker tag "$IMAGE_TAG" "$IMAGE_BRANCH"
@@ -79,15 +87,14 @@ jobs:
 
     - stage: snapshot
       name: "Deploy Snapshot to Maven repo"
-      if: branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
+      #if: branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
       install: true
       script:
         - echo "Not Yet Implemented ..."
 
     - stage: release
       name: "Release to OSS SonaType"
-      if: tag =~ /^[0-9\.]+$/
-#      jdk: openjdk8
+      #if: tag =~ /^[0-9\.]+$/
       install: true
       script:
         - echo "Not Yet Implemented ..."
