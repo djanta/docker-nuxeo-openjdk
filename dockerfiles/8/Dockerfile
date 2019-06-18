@@ -26,7 +26,7 @@ RUN set -x \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
-	&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
+	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
 	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
 	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
