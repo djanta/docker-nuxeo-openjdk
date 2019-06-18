@@ -5,16 +5,26 @@ language: bash
 services:
   - docker
 
-#cache:
-#  directories:
-#    - $HOME/.m2
+# Don't build release tags. This avoids publish conflicts because the version commit exists both on master and the release tag.
+# See https://github.com/travis-ci/travis-ci/issues/1532
+branches:
+  except:
+  - /^[0-9]/
 
-env:
-  - VERSION=8 VARIANT=jdk
-  - VERSION=9 VARIANT=jdk
+  # safelist
+  only:
+  - master
+  - develop
+  - release
 
-#jdk:
-#  - openjdk8
+#env:
+#  - VERSION=8 VARIANT=jdk
+#  - VERSION=9 VARIANT=jdk
+
+matrix:
+  include:
+    - env: VERSION=8 VARIANT=jdk
+    - env: VERSION=9 VARIANT=jdk
 
 # before install any component
 before_install:
@@ -41,41 +51,24 @@ before_script:
   - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-$VARIANT-${TRAVIS_BRANCH}"
 
   # Making sure we login ...
-  #- docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
 
 # When successfully built
 after_success:
   - echo "Running after success ..."
 
-# Don't build release tags. This avoids publish conflicts because the version commit exists both on master and the release tag.
-# See https://github.com/travis-ci/travis-ci/issues/1532
-branches:
-  except:
-    - /^[0-9]/
-
-# safelist
-  only:
-    - master
-    - develop
-    - release
-
 jobs:
   include:
     - stage: develop
       name: "Build and Unit Testing the develop & PR branch"
       if: (branch = develop AND type != pull_request) AND commit_message !~ /^(prepare release ([0-9\.]+))$/
-#      jdk: openjdk8
       install: true
       before_deploy:
-        #- TRAVIS_TAG=build-$TRAVIS_BUILD_NUMBER
-        #- git_sha="$(git rev-parse --short HEAD)"
         - docker tag "$IMAGE_TAG" "$IMAGE_BRANCH"
-        #- docker tag "${IMAGE_BASE}" "${IMAGE_BASE}:${git_sha}-develop"
       script:
         #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
         - docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-        #- travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
+        - travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
       after_script:
         - docker images
       deploy:
@@ -87,7 +80,6 @@ jobs:
     - stage: snapshot
       name: "Deploy Snapshot to Maven repo"
       if: branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
-#      jdk: openjdk8
       install: true
       script:
         - echo "Not Yet Implemented ..."
