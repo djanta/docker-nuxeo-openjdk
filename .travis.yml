@@ -8,14 +8,15 @@ services:
 # Don't build release tags. This avoids publish conflicts because the version commit exists both on master and the release tag.
 # See https://github.com/travis-ci/travis-ci/issues/1532
 branches:
-  except:
-  - /^[0-9]/
+#  except:
+#  - /^[0-9]/
 
   # safelist
   only:
   - master
   - develop
   - release
+  - /^[0-9]/
 
 #jdk:
 #  - 8
@@ -24,7 +25,7 @@ branches:
 env:
   matrix:
     - VERSION=8 VARIANT=jdk
-    - VERSION=9 VARIANT=jdk
+#    - VERSION=9 VARIANT=jdk
 
 # before install any component
 before_install:
@@ -89,7 +90,7 @@ jobs:
         - echo "Not Yet Implemented ..."
 
     - stage: release
-      name: "Release to OSS SonaType"
+      name: "Release, Tag & push the released version"
       #if: tag =~ /^[0-9\.]+$/
       install: true
       script:
