@@ -69,9 +69,10 @@ RUN set -x \
 	# Install all nuxeo required tools
 	perl imagemagick pwgen ffmpeg2theora ffmpeg ufraw x264 \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
+	# Just for a debugin purposes ...
   && lsb_release -a && lsb_release -cs && lsb_release -is \
   # Registering yq (repository)
-  && add-apt-repository ppa:rmescandon/yq \
+  && add-apt-repository ppa:rmescandon/yq && apt-get update -y \
   # Install Yaml Parser & Json Parser
   && apt-get install -y yq jq \
 	# Clenaing up ...
