@@ -60,7 +60,8 @@ stages:
   - name: snapshot
     if: branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
   - name: release
-    if: tag =~ /^[0-9\.]+$/
+    ## Validator: https://regex101.com/
+    if: tag =~ /^(rc|v|version|release|tag)?(-)?([0-9\.]+)(-)(patch|beta|alpha)?$/
 
 jobs:
   include:

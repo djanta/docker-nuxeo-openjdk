@@ -22,6 +22,10 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 # Activate the debug option
 RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
+	# Install Yaml Parser & Json Parser
+	yq jq \
+	# Installing inotify-tools and gzip
+	inotify-tools gzip \
 	# install gpg tools
 	gnupg2 dirmngr \
 
