@@ -20,13 +20,13 @@ ENV GOSU_VERSION 1.10
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN set -x \
-  && apt-get install software-properties-common -y
+  && apt-get install software-properties-common python-software-properties -y
+  && add-apt-repository "ppa:rmescandon/yq"
 
 # Activate the debug option
 RUN set -x \
   #&& apt-get install software-properties-common -y
   && apt-get update
-  && add-apt-repository "ppa:rmescandon/yq"
 	&& apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
 	# Install Yaml Parser & Json Parser
 	#yq \
