@@ -21,7 +21,8 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN set -x \
   && apt-get install software-properties-common python-software-properties -y
-  && apt update && apt-upgrade
+  && apt-get update
+  #&& apt-upgrade
   #&& add-apt-repository ppa:rmescandon/yq
 
 # Activate the debug option
