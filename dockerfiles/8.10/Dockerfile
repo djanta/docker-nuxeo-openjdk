@@ -32,8 +32,16 @@ RUN lsb_release -a
 # Print out the distribution informations
 RUN lsb_release -cs
 
+# Print out the distribution informations
+RUN lsb_release -is
+
+#OS=$(awk '/DISTRIB_ID=/' /etc/*-release | sed 's/DISTRIB_ID=//' | tr '[:upper:]' '[:lower:]')
+#ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
+#VERSION=$(awk '/DISTRIB_RELEASE=/' /etc/*-release | sed 's/DISTRIB_RELEASE=//' | sed 's/[.]0/./')
+
 #adding the docker repository to the debian sources.list
-RUN add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs)  main"
+#RUN add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs)  main"
+RUN echo "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs) main" >> /etc/apt/source.list.d/dockerproject.list
 
 #RUN set -x \
 #  && apt-get install software-properties-common python-software-properties add-repository -y
