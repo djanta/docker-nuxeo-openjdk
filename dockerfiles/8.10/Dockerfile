@@ -30,7 +30,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN set -x \
   #&& apt-get install software-properties-common -y
 	&& apt-get update && apt-get install -y --no-install-recommends apt-utils apt-transport-https lsb-release \
-	software-properties-common python-software-properties \
+	software-properties-common \
 	ca-certificates wget \
 	# Install Yaml Parser & Json Parser
 	#yq \
