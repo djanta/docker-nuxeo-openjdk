@@ -20,8 +20,8 @@ ENV GOSU_VERSION 1.10
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN set -x \
-  #&& apt-get install software-properties-common python-software-properties -y
-  && apt-get update
+  && apt-get install software-properties-common python-software-properties add-repository -y
+  #&& apt-get update
   #&& apt-upgrade
   #&& apt-get install add-repository
   #&& add-apt-repository ppa:rmescandon/yq
