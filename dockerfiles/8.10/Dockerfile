@@ -59,7 +59,7 @@ RUN set -x \
 	&& echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list \
   # && apt install software-properties-common -y
 	&& apt-get update -y && apt-get install -y --no-install-recommends lsb-release apt-utils apt-transport-https \
-	#software-properties-common \
+	software-properties-common \
 	ca-certificates wget \
 	# Installing inotify-tools and gzip
 	inotify-tools gzip \
@@ -73,7 +73,7 @@ RUN set -x \
   #yq \
   #jq \
   && lsb_release -a && lsb_release -cs && lsb_release -is \
-  && apt-get install software-properties-common add-repository -y \
+  && add-apt-repository ppa:rmescandon/yq \
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
 	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
