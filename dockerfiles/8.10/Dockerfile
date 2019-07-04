@@ -21,14 +21,15 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN set -x \
   && apt-get install software-properties-common python-software-properties -y
-  && which add-apt-repository
+  && apt update && sudo apt-upgrade
   #&& add-apt-repository ppa:rmescandon/yq
 
 # Activate the debug option
 RUN set -x \
   #&& apt-get install software-properties-common -y
   && apt-get update
-	&& apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
+	&& apt-get install -y --no-install-recommends apt-utils apt-transport-https lsb-release \
+	ca-certificates wget \
 	# Install Yaml Parser & Json Parser
 	#yq \
 	#jq \
