@@ -41,7 +41,7 @@ RUN lsb_release -is
 
 #adding the docker repository to the debian sources.list
 #RUN add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs)  main"
-RUN echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list
+#RUN echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list
 
 #RUN set -x \
 #  && apt-get install software-properties-common python-software-properties add-repository -y
@@ -52,13 +52,15 @@ RUN echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_releas
 
 # Activate the debug option
 RUN set -x \
+  && apt-cache policy lsb-release \
+
+	# Registering (add-apt-repository)
+	#&& add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs) main" \
+	&& echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list \
   # && apt install software-properties-common -y
 	&& apt-get update -y && apt-get install -y --no-install-recommends lsb-release apt-utils apt-transport-https \
 	#software-properties-common \
 	ca-certificates wget \
-	# Install Yaml Parser & Json Parser
-	#yq \
-	#jq \
 	# Installing inotify-tools and gzip
 	inotify-tools gzip \
 	# install gpg tools
@@ -67,8 +69,11 @@ RUN set -x \
 	# Install all nuxeo required tools
 	perl imagemagick pwgen ffmpeg2theora ffmpeg ufraw x264 \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
-	# Registering (add-apt-repository)
-	&& add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs) main" \
+  # Install Yaml Parser & Json Parser
+  #yq \
+  #jq \
+  && lsb_release -a && lsb_release -cs && lsb_release -is \
+  && apt-get install software-properties-common python-software-properties add-repository -y \
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
 	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
