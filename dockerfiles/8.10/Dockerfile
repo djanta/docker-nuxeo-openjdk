@@ -29,7 +29,8 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 # Activate the debug option
 RUN set -x \
   #&& apt-get install software-properties-common -y
-	&& apt-get update && apt-get install -y --no-install-recommends apt-utils apt-transport-https lsb-release \
+	&& apt-get update && apt-get install -y --no-install-recommends add-repository \
+	apt-utils apt-transport-https lsb-release \
 	#software-properties-common \
 	ca-certificates wget \
 	# Install Yaml Parser & Json Parser
