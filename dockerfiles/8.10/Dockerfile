@@ -69,11 +69,11 @@ RUN set -x \
 	# Install all nuxeo required tools
 	perl imagemagick pwgen ffmpeg2theora ffmpeg ufraw x264 \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
-  # Install Yaml Parser & Json Parser
-  #yq \
-  #jq \
   && lsb_release -a && lsb_release -cs && lsb_release -is \
+  # Registering yq (repository)
   && add-apt-repository ppa:rmescandon/yq \
+  # Install Yaml Parser & Json Parser
+  && apt-get install -y yq jq \
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
 	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
