@@ -21,6 +21,12 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN apt-cache policy lsb-release
 
+# Upgrade
+RUN apt-get update
+
+#Upgrade
+RUN apt-get upgrade
+
 RUN apt-get install lsb-release
 
 # Print out the distribution informations
