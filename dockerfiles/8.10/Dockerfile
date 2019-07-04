@@ -19,12 +19,15 @@ ENV GOSU_VERSION 1.10
 #=====================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+RUN set -x \
+  && add-apt-repository "ppa:rmescandon/yq"
+
 # Activate the debug option
 RUN set -x \
   #&& add-apt-repository "ppa:rmescandon/yq"
 	&& apt-get update && apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
 	# Install Yaml Parser & Json Parser
-	yq \
+	#yq \
 	#jq \
 	# Installing inotify-tools and gzip
 	inotify-tools gzip \
