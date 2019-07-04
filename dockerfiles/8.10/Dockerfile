@@ -73,7 +73,7 @@ RUN set -x \
   #yq \
   #jq \
   && lsb_release -a && lsb_release -cs && lsb_release -is \
-  && apt-get install software-properties-common python-software-properties add-repository -y \
+  && apt-get install software-properties-common add-repository -y \
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
 	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
