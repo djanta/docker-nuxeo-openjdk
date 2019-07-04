@@ -24,16 +24,16 @@ RUN apt-cache policy lsb-release
 # Upgrade
 RUN apt-get update -y
 
-#Upgrade
-#RUN apt-get upgrade
-
 RUN apt-get install lsb-release -y
 
 # Print out the distribution informations
 RUN lsb_release -a
 
+# Print out the distribution informations
+RUN lsb_release -cs
+
 #adding the docker repository to the debian sources.list
-#RUN add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs)  main"
+RUN add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs)  main"
 
 #RUN set -x \
 #  && apt-get install software-properties-common python-software-properties add-repository -y
@@ -45,8 +45,7 @@ RUN lsb_release -a
 # Activate the debug option
 RUN set -x \
   # && apt install software-properties-common -y
-	&& apt-get update && apt-get install -y --no-install-recommends \
-	apt-utils apt-transport-https lsb-release \
+	&& apt-get update -y && apt-get install -y --no-install-recommends lsb-release apt-utils apt-transport-https \
 	#software-properties-common \
 	ca-certificates wget \
 	# Install Yaml Parser & Json Parser
@@ -60,6 +59,8 @@ RUN set -x \
 	# Install all nuxeo required tools
 	perl imagemagick pwgen ffmpeg2theora ffmpeg ufraw x264 \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
+	# Registering (add-apt-repository)
+	&& add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs) main"
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
 	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
