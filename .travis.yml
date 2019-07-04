@@ -24,8 +24,8 @@ branches:
 
 env:
   matrix:
-    - VERSION=8 VARIANT=jdk
-#    - VERSION=9 VARIANT=jdk
+    - VERSION=8.10 VARIANT=jdk
+#    - VERSION=9.10 VARIANT=jdk
 
 # before install any component
 before_install:
