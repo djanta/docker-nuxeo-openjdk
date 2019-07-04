@@ -19,6 +19,10 @@ ENV GOSU_VERSION 1.10
 #=====================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+RUN apt-cache policy lsb-release
+
+RUN apt-get install lsb-release
+
 # Print out the distribution informations
 RUN lsb_release -a
 
