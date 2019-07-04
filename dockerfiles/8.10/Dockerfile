@@ -21,7 +21,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # Activate the debug option
 RUN set -x \
-  && add-apt-repository "ppa:rmescandon/yq"
+  #&& add-apt-repository "ppa:rmescandon/yq"
 	&& apt-get update && apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
 	# Install Yaml Parser & Json Parser
 	yq \
