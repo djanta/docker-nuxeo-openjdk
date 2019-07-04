@@ -19,6 +19,12 @@ ENV GOSU_VERSION 1.10
 #=====================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+# Print out the distribution informations
+RUN lsb_release -a
+
+#adding the docker repository to the debian sources.list
+#RUN add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs)  main"
+
 #RUN set -x \
 #  && apt-get install software-properties-common python-software-properties add-repository -y
 #  #&& apt-get update
@@ -28,7 +34,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # Activate the debug option
 RUN set -x \
-  && apt install software-properties-common -y
+  # && apt install software-properties-common -y
 	&& apt-get update && apt-get install -y --no-install-recommends \
 	apt-utils apt-transport-https lsb-release \
 	#software-properties-common \
