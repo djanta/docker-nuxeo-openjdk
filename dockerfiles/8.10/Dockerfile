@@ -19,47 +19,15 @@ ENV GOSU_VERSION 1.10
 #=====================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-RUN apt-cache policy lsb-release
-
-# Upgrade
-RUN apt-get update -y
-
-RUN apt-get install lsb-release -y
-
-# Print out the distribution informations
-RUN lsb_release -a
-
-# Print out the distribution informations
-RUN lsb_release -cs
-
-# Print out the distribution informations
-RUN lsb_release -is
-
-#OS=$(awk '/DISTRIB_ID=/' /etc/*-release | sed 's/DISTRIB_ID=//' | tr '[:upper:]' '[:lower:]')
-#ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
-#VERSION=$(awk '/DISTRIB_RELEASE=/' /etc/*-release | sed 's/DISTRIB_RELEASE=//' | sed 's/[.]0/./')
-
-#adding the docker repository to the debian sources.list
-#RUN add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs)  main"
-#RUN echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list
-
-#RUN set -x \
-#  && apt-get install software-properties-common python-software-properties add-repository -y
-#  #&& apt-get update
-#  #&& apt-upgrade
-#  #&& apt-get install add-repository
-#  #&& add-apt-repository ppa:rmescandon/yq
-
 # Activate the debug option
 RUN set -x \
-  && apt-cache policy lsb-release \
-
-	# Registering (add-apt-repository)
-	#&& add-apt-repository  "deb https://apt.dockerproject.org/repo debian-$(lsb_release -cs) main" \
-	&& echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list \
+##  && apt-cache policy lsb-release \
+#	# Registering (add-apt-repository)
+##	&& echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list \
   # && apt install software-properties-common -y
-	&& apt-get update -y && apt-get install -y --no-install-recommends lsb-release apt-utils apt-transport-https \
-	software-properties-common \
+	&& apt-get update -y && apt-get install -y --no-install-recommends apt-utils apt-transport-https \
+##	lsb-release \
+##	software-properties-common \
 	ca-certificates wget \
 	# Installing inotify-tools and gzip
 	inotify-tools gzip \
@@ -69,12 +37,12 @@ RUN set -x \
 	# Install all nuxeo required tools
 	perl imagemagick pwgen ffmpeg2theora ffmpeg ufraw x264 \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
-	# Just for a debugin purposes ...
-  && lsb_release -a && lsb_release -cs && lsb_release -is \
-  # Registering yq (repository)
-  && add-apt-repository ppa:rmescandon/yq && apt-get update -y \
-  # Install Yaml Parser & Json Parser
-  && apt-get install -y yq jq \
+#	# Just for a debuging purposes ...
+##  && lsb_release -a && lsb_release -cs && lsb_release -is \
+#  # Registering yq (repository)
+##  && add-apt-repository ppa:rmescandon/yq && apt-get update -y \
+#  # Install Yaml Parser & Json Parser
+##  && apt-get install -y yq jq \
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
 	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
