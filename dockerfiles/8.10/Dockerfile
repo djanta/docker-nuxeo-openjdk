@@ -22,8 +22,9 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 # Activate the debug option
 RUN set -x \
   && apt-get install software-properties-common
+  && apt-get update
   && add-apt-repository "ppa:rmescandon/yq"
-	&& apt-get update && apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
+	&& apt-get install -y --no-install-recommends apt-utils ca-certificates wget \
 	# Install Yaml Parser & Json Parser
 	#yq \
 	#jq \
