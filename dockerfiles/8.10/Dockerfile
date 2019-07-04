@@ -27,7 +27,7 @@ RUN apt-get update -y
 #Upgrade
 #RUN apt-get upgrade
 
-RUN apt-get install lsb-release
+RUN apt-get install lsb-release -y
 
 # Print out the distribution informations
 RUN lsb_release -a
