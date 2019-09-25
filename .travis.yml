@@ -48,11 +48,20 @@ before_script:
   - env | sort
   - cd "dockerfiles/$VERSION"
   - IMAGE_BASE="${ACCOUNT_ID:-djantaio}/nuxeo-openjdk"
-  - IMAGE_TAG="${IMAGE_BASE}:$VERSION-$VARIANT"
-  - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-$VARIANT-${TRAVIS_BRANCH}"
+#  - IMAGE_TAG="${IMAGE_BASE}:$VERSION-$VARIANT"
+  - IMAGE_TAG="${IMAGE_BASE}:$VERSION"
+#  - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-$VARIANT-${TRAVIS_BRANCH}"
+  - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-${TRAVIS_BRANCH}"
 
   # Making sure we login ...
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
+
+script:
+  #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
+  - docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
+  #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
+after_script:
+  - docker images
 
 stages:
   - name: develop
@@ -67,16 +76,9 @@ jobs:
   include:
     - stage: develop
       name: "Build and Unit Testing the develop & PR branch"
-      #if: (branch = develop AND type != pull_request) AND commit_message !~ /^(prepare release ([0-9\.]+))$/
       install: true
       before_deploy:
         - docker tag "$IMAGE_TAG" "$IMAGE_BRANCH"
-      script:
-        #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-        - docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-        #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
-      after_script:
-        - docker images
       deploy:
         provider: script
         script: docker push "$IMAGE_BRANCH" #&& docker push "${IMAGE_NAME}:${git_sha}-develop"
@@ -85,17 +87,11 @@ jobs:
 
     - stage: snapshot
       name: "Deploy Snapshot to Maven repo"
-      #if: branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
       install: true
-      script:
-        - echo "Not Yet Implemented ..."
 
     - stage: release
       name: "Release, Tag & push the released version"
-      #if: tag =~ /^[0-9\.]+$/
       install: true
-      script:
-        - echo "Not Yet Implemented ..."
 
 notifications:
   email:

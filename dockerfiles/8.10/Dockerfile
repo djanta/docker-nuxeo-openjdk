@@ -3,7 +3,7 @@ FROM openjdk:8-jdk
 MAINTAINER DJANTA, LLC <team.docker@djanta.io>
 
 LABEL description="OpenJDK and Nuxeo preset tools build together and share across all over any Nuxeo specific distribution"
-LABEL version="0.0-SNAPSHOT"
+LABEL version="8-jdk"
 
 ARG DEBIAN_FRONTEND
 
@@ -43,6 +43,7 @@ RUN set -x \
 ##  && add-apt-repository ppa:rmescandon/yq && apt-get update -y \
 #  # Install Yaml Parser & Json Parser
 ##  && apt-get install -y yq jq \
+
 	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
 	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
