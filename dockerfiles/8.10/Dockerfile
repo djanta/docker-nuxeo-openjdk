@@ -34,6 +34,9 @@ RUN set -x \
 	# install gpg tools
 	gnupg2 dirmngr \
 
+  # Install nettool for 'netstat' purposes
+  net-tools \
+
 	# Install all nuxeo required tools
 	perl imagemagick pwgen ffmpeg2theora ffmpeg ufraw x264 \
 	libreoffice ghostscript exiftool poppler-utils libwpd-tools \
