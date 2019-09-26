@@ -61,7 +61,7 @@ before_script:
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
 
   # Login into github docker registry ...
-  - echo "$GH_TOKEN" | docker login  docker.pkg.github.com --username "$GH_USER" --password-stdin
+#  - echo "$GH_TOKEN" | docker login  docker.pkg.github.com --username "$GH_USER" --password-stdin
 
 script:
   #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
@@ -86,11 +86,11 @@ jobs:
       install: true
       before_deploy:
         - docker tag "$IMAGE_TAG" "$IMAGE_BRANCH"
-        - docker tag "$IMAGE_TAG" $GITHUB_REGISTRY/$GITHUB_IMAGE_BRANCH
+#        - docker tag "$IMAGE_TAG" $GITHUB_REGISTRY/$GITHUB_IMAGE_BRANCH
       deploy:
         provider: script
         #&& docker push "${IMAGE_NAME}:${git_sha}-develop"
-        script: docker push "$IMAGE_BRANCH" && docker push ${GITHUB_REGISTRY}/$GITHUB_IMAGE_BRANCH
+        script: docker push "$IMAGE_BRANCH" #&& docker push ${GITHUB_REGISTRY}/$GITHUB_IMAGE_BRANCH
         on:
           branch: develop
 
