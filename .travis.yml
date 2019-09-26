@@ -47,14 +47,24 @@ before_install:
 before_script:
   - env | sort
   - cd "dockerfiles/$VERSION"
-  - IMAGE_BASE="${ACCOUNT_ID:-djantaio}/nuxeo-openjdk"
-#  - IMAGE_TAG="${IMAGE_BASE}:$VERSION-$VARIANT"
+  - BASE=${ACCOUNT_ID:-djanta}
+  - PROJECT=nuxeo-sdk
+  - IMAGE_BASE="${BASE}/${PROJECT}"
   - IMAGE_TAG="${IMAGE_BASE}:$VERSION"
-#  - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-$VARIANT-${TRAVIS_BRANCH}"
-  - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-${TRAVIS_BRANCH}"
+  - IMAGE_BRANCH="${IMAGE_TAG}-${TRAVIS_BRANCH}"
 
-  # Making sure we login ...
+  - GITHUB_IMAGE_TAG="${PROJECT}:${VERSION}"
+  - GITHUB_IMAGE_BRANCH="${GITHUB_IMAGE_TAG}-${TRAVIS_BRANCH}"
+  - GITHUB_REGISTRY=docker.pkg.github.com/djanta/docker-nuxeo-sdk
+
+#  - IMAGE_TAG="${IMAGE_BASE}:$VERSION-$VARIANT"
+#  - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-$VARIANT-${TRAVIS_BRANCH}"
+
+  # Login into official docker registry ...
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
+
+  # Login into github docker registry ...
+  - echo "$GH_TOKEN" | docker login  docker.pkg.github.com --username "$GH_USER" --password-stdin
 
 script:
   #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
@@ -79,9 +89,11 @@ jobs:
       install: true
       before_deploy:
         - docker tag "$IMAGE_TAG" "$IMAGE_BRANCH"
+        - docker tag "$IMAGE_TAG" ${GITHUB_REGISTRY}/$GITHUB_IMAGE_BRANCH
       deploy:
         provider: script
-        script: docker push "$IMAGE_BRANCH" #&& docker push "${IMAGE_NAME}:${git_sha}-develop"
+        #&& docker push "${IMAGE_NAME}:${git_sha}-develop"
+        script: docker push "$IMAGE_BRANCH" && docker push ${GITHUB_REGISTRY}/${GITHUB_IMAGE_BRANCH}
         on:
           branch: develop
 
