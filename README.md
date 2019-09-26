@@ -1,7 +1,7 @@
-# docker-nuxeo-openjdk
+# docker-nuxeo-sdk
 =====================================
 
-[![build status badge](https://img.shields.io/travis/djantaio/docker-nuxeo-openjdk/master.svg)](https://travis-ci.org/djantaio/docker-nuxeo-openjdk/branches)
+[![build status badge](https://img.shields.io/travis/djantaio/docker-nuxeo-sdk/master.svg)](https://travis-ci.org/djantaio/docker-nuxeo-sdk/branches)
 
 A one paragraph description about the container.
 

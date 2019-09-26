@@ -57,9 +57,6 @@ before_script:
   - GITHUB_IMAGE_BRANCH="${GITHUB_IMAGE_TAG}-${TRAVIS_BRANCH}"
   - GITHUB_REGISTRY=docker.pkg.github.com/djanta/docker-nuxeo-sdk
 
-#  - IMAGE_TAG="${IMAGE_BASE}:$VERSION-$VARIANT"
-#  - IMAGE_BRANCH="${IMAGE_BASE}:$VERSION-$VARIANT-${TRAVIS_BRANCH}"
-
   # Login into official docker registry ...
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
 
@@ -68,7 +65,7 @@ before_script:
 
 script:
   #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-  - docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
+  - docker --debug build -t "$IMAGE_TAG" --file dockerfiles/${VERSION} . #--file "Dockerfile-${VARIANT}"
   #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
 after_script:
   - docker images
