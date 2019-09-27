@@ -42,12 +42,11 @@ before_install:
   - git config credential.helper "store --file=.git/credentials"
   - echo "https://$GH_TOKEN:@github.com" > .git/credentials
 
+  #Install docker library official image testing ...
+  - git clone https://github.com/docker-library/official-images.git ~/official-images
+
   # Update all git submodule (No need this manual submodule update ...)
   ##- git submodule init && git submodule update --init --recursive --remote --merge
-
-# Install any required components
-#install:
-#  - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
   - env | sort
@@ -60,7 +59,7 @@ before_script:
 
   - GITHUB_IMAGE_TAG="${PROJECT}:${VERSION}"
   - GITHUB_IMAGE_BRANCH="${GITHUB_IMAGE_TAG}-${TRAVIS_BRANCH}"
-  - GITHUB_REGISTRY=docker.pkg.github.com/djanta/docker-nuxeo-sdk
+  - GITHUB_REGISTRY=docker.pkg.github.com/$TRAVIS_REPO_SLUG
 
   # Login into official docker registry ...
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
@@ -73,6 +72,9 @@ script:
   #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
   ##- travis_wait 30 travis_retry docker --debug build -t $IMAGE_TAG --file Dockerfile .
   - travis_wait 30 travis_retry docker --debug build -t $IMAGE_TAG --file $TRAVIS_BUILD_DIR/dockerfiles/$VERSION/Dockerfile .
+
+  # Testing the current given built image
+  - travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
 
 after_script:
   - docker images
