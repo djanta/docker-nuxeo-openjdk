@@ -61,12 +61,13 @@ before_script:
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
 
   # Login into github docker registry ...
-#  - echo "$GH_TOKEN" | docker login  docker.pkg.github.com --username "$GH_USER" --password-stdin
+  - echo "$GH_TOKEN" | docker login  docker.pkg.github.com --username "$GH_USER" --password-stdin
 
 script:
   #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
   ##- docker --debug build -t djanta/nuxeo-sdk:8.10 -f "./dockerfiles/8.10/Dockerfile" .
   #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
+  - docker --debug build --help
 after_script:
   - docker images
 
