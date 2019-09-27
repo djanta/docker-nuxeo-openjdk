@@ -68,7 +68,7 @@ script:
   ##- docker --debug build -t djanta/nuxeo-sdk:8.10 -f "./dockerfiles/8.10/Dockerfile" .
   #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
   - docker --debug build --help
-  - docker --debug build -t $IMAGE_TAG .
+  - travis_wait 30 travis_retry docker --debug build -t $IMAGE_TAG --file "./dockerfiles/$VERSION/Dockerfile"
 after_script:
   - docker images
 
