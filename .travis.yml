@@ -56,10 +56,12 @@ before_script:
   - IMAGE_BASE="${BASE}/${PROJECT}"
   - IMAGE_TAG="${IMAGE_BASE}:$VERSION"
   - IMAGE_BRANCH="${IMAGE_TAG}-${TRAVIS_BRANCH}"
+  - IMAGE_SNAPSHOT="${IMAGE_TAG}-snapshot"
 
   - GITHUB_IMAGE_TAG="${PROJECT}:${VERSION}"
   - GITHUB_IMAGE_BRANCH="${GITHUB_IMAGE_TAG}-${TRAVIS_BRANCH}"
   - GITHUB_REGISTRY=docker.pkg.github.com/$TRAVIS_REPO_SLUG
+  - GITHUB_IMAGE_SNAPSHOT="${GITHUB_IMAGE_TAG}-snapshot"
 
   # Login into official docker registry ...
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
@@ -68,9 +70,6 @@ before_script:
   - echo "$GH_TOKEN" | docker login  docker.pkg.github.com --username "$GH_USER" --password-stdin
 
 script:
-  #- travis_wait 60 docker --debug build -t "$IMAGE_TAG" . #--file "Dockerfile-${VARIANT}"
-  #- travis_wait 30 travis_retry ~/official-images/test/run.sh "$IMAGE_TAG"
-  ##- travis_wait 30 travis_retry docker --debug build -t $IMAGE_TAG --file Dockerfile .
   - travis_wait 30 travis_retry docker --debug build -t $IMAGE_TAG --file $TRAVIS_BUILD_DIR/dockerfiles/$VERSION/Dockerfile .
 
   # Testing the current given built image
@@ -84,6 +83,8 @@ stages:
     if: (branch = develop AND type != pull_request) AND commit_message !~ /^(prepare release ([0-9\.]+))$/
   - name: snapshot
     if: branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
+  - name: rehydrate
+    if: $TRAVIS_EVENT_TYPE = cron #branch = master AND type != pull_request AND commit_message !~ /^(prepare release ([0-9\.]+))$/
   - name: release
     ## Validator: https://regex101.com/
     if: tag =~ /^((rc|v|version|release|tag)(-)?)?([0-9\.]+)((-)?(patch|beta|alpha))?$/
@@ -96,20 +97,35 @@ jobs:
       before_deploy:
         - docker tag "$IMAGE_TAG" "$IMAGE_BRANCH"
         - docker tag "$IMAGE_TAG" $GITHUB_REGISTRY/$GITHUB_IMAGE_BRANCH
-      deploy:
-        provider: script
-        #&& docker push "${IMAGE_NAME}:${git_sha}-develop"
-        script: docker push "$IMAGE_BRANCH" && docker push ${GITHUB_REGISTRY}/$GITHUB_IMAGE_BRANCH
-        on:
-          branch: develop
+#      deploy:
+#        provider: script
+#        script: docker push "$IMAGE_BRANCH" && docker push ${GITHUB_REGISTRY}/$GITHUB_IMAGE_BRANCH
+#        on:
+#          branch: develop
 
     - stage: snapshot
       name: "Deploy Snapshot to Maven repo"
       install: true
+      before_deploy:
+        - docker tag "$IMAGE_TAG" "$IMAGE_SNAPSHOT"
+        - docker tag "$IMAGE_TAG" $GITHUB_REGISTRY/$GITHUB_IMAGE_SNAPSHOT
+      deploy:
+        provider: script
+        script: docker push "$IMAGE_SNAPSHOT" && docker push ${GITHUB_REGISTRY}/$GITHUB_IMAGE_SNAPSHOT
+        on:
+          branch: master
 
     - stage: release
       name: "Release, Tag & push the released version"
       install: true
+      before_deploy:
+        - docker tag "$IMAGE_TAG" "$IMAGE_TAG"
+        - docker tag "$IMAGE_TAG" $GITHUB_REGISTRY/$IMAGE_TAG
+      deploy:
+        provider: script
+        script: docker push "$IMAGE_TAG" && docker push ${GITHUB_REGISTRY}/$IMAGE_TAG
+#        on:
+#          branch: release
 
 notifications:
   email:
