@@ -31,7 +31,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        arch: [debian, ubuntu, rhel7]
+#        arch: [debian, ubuntu, rhel7]
 #        fail-fast: false
 #    if: github.event_name == 'push' && startsWith(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     steps:
@@ -75,6 +75,12 @@ jobs:
 #          git config user.email "${{ secrets.GH_USER_EMAIL }}"
 #          git config credential.helper "store --file=.git/credentials"
 #          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
+
+      - name: Increment Step Patch
+        id: increment-semver-patch
+        uses: Benbentwo/increment-semver@master
+        with:
+          version-level: '-M'
       - name: Docker Build Image - ${{ matrix.os }}
         env:
           GH_USER: ${{ secrets.GH_USER }}
@@ -84,4 +90,8 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           which docker
+          echo "The new patch version was ${{ steps.increment-semver-patch.outputs.version }}"
+          echo "The new minor version was ${{ steps.increment-semver-minor.outputs.version }}"
+          echo "The new Major version was ${{ steps.increment-semver-major.outputs.version }}"
+          echo "The new version was ${{ steps.increment-semver-major.outputs }}"
 #          ./mvnw -B -X -s $(pwd)/.mvn/settings.xml -DskipTests=false clean verify

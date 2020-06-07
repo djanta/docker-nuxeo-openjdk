@@ -1,8 +1,15 @@
 FROM debian:10.4-slim
 
-ARG BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-ARG BUILD_VERSION="$(date -u +'%y.%m')"
+# Declaring expected external variable
+ARG BUILD_VERSION
 ARG RELEASE_VERSION="$(date -u +'%y.%m')"
+
+RUN echo "Oh dang look at that: $BUILD_VERSION"
+
+# Internal variable overiding ...
+ARG BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+#ARG BUILD_VERSION="$(date -u +'%y.%m')"
+#ARG RELEASE_VERSION="$(date -u +'%y.%m')"
 ARG LAST_COMMIT="$(git rev-parse HEAD)"
 ARG BUILD_HASH="$LAST_COMMIT"
 
@@ -36,26 +43,18 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # Activate the debug option
 RUN set -x \
-##  && apt-cache policy lsb-release \
-#	# Registering (add-apt-repository)
-##	&& echo "deb https://apt.dockerproject.org/repo $(lsb_release -is)-$(lsb_release -cs) main" >> /etc/apt/source.list \
-  # && apt install software-properties-common -y
 	&& apt-get update -y \
 	&& apt-get install -y --no-install-recommends \
 	apt-utils \
 	apt-transport-https \
-##	lsb-release \
-##	software-properties-common \
 	ca-certificates wget \
-# Installing inotify-tools that should be used in the sub-adjacent image to synchronize the developer build 
 	inotify-tools \
-# Install nettool for 'netstat' purposes
   	net-tools \
 	gzip \
 	gnupg2 \
 	dirmngr \
-# Install all nuxeo required tools
 	perl \
+	handbrake \
 	imagemagick \
 	pwgen \
 	ffmpeg2theora \
@@ -67,15 +66,7 @@ RUN set -x \
 	exiftool \
 	poppler-utils \
 	libwpd-tools \
-#	# Just for a debuging purposes ...
-##  && lsb_release -a && lsb_release -cs && lsb_release -is \
-#  # Registering yq (repository)
-##  && add-apt-repository ppa:rmescandon/yq && apt-get update -y \
-#  # Install Yaml Parser & Json Parser
-##  && apt-get install -y yq jq \
-	# Clenaing up ...
 	&& rm -rf /var/lib/apt/lists/* \
-	#&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
 	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
 	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
