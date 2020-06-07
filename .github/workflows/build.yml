@@ -30,8 +30,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        version: ['1.8']
         os: [ubuntu-latest]
+        arch: [debian, ubuntu, rhel7]
 #        fail-fast: false
 #    if: github.event_name == 'push' && startsWith(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     steps:
@@ -68,32 +68,20 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
-
-      - name: Set up JDK ${{ matrix.version }}
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.version }}
-      - name: GitHub credentials configuration - ${{ matrix.os }} with version ${{ matrix.version }}
+      - name: GitHub credentials configuration - ${{ matrix.os }}
         shell: bash
         run: |
-          echo "GITHUB_TOKEN = $GITHUB_TOKEN, GITHUB_TOKEN Secret: ${{ secrets.GITHUB_TOKEN }}"
           git config user.name "${{ secrets.GH_USER }}"
-          git config user.email "${{ secrets.GH_USER_EMAIL }}"
-          git config credential.helper "store --file=.git/credentials"
-          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
-      - name: Maven Build (Clean & verify) - ${{ matrix.os }} with version ${{ matrix.version }}
+#          git config user.email "${{ secrets.GH_USER_EMAIL }}"
+#          git config credential.helper "store --file=.git/credentials"
+#          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
+      - name: Docker Build Image - ${{ matrix.os }}
         env:
           GH_USER: ${{ secrets.GH_USER }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_USERNAME: ${{ secrets.GH_USER }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           which docker
 #          ./mvnw -B -X -s $(pwd)/.mvn/settings.xml -DskipTests=false clean verify
