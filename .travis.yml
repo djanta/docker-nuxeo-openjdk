@@ -69,6 +69,9 @@ before_script:
   # Login into github docker registry ...
   - echo "$GH_TOKEN" | docker login  docker.pkg.github.com --username "$GH_USER" --password-stdin
 
+  # Year based version format. CREDIT: https://www.cyberciti.biz/faq/linux-unix-formatting-dates-for-display/
+  - R_VERSION=$(date -u +'%y.%m')
+
 script:
   - travis_wait 30 travis_retry docker --debug build -t $IMAGE_TAG --file $TRAVIS_BUILD_DIR/dockerfiles/$VERSION/Dockerfile .
 
