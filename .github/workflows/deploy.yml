@@ -24,21 +24,16 @@ on:
       - 'refs/tags/*'
       - '!refs/heads/*'
 jobs:
-  local:
-    runs-on: ${{ matrix.os }}
-  dockerhub:
+  publish:
     needs: [local]
  #    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
+ #       os: [ubuntu-latest]
  #       registry: [/*gcr.io*/ /*,docker.pkg.github.com*/]
     steps:
       - name : GITHUB CONTEXT
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-  github:
-    needs: [local]
-    runs-on: ${{ matrix.os }}

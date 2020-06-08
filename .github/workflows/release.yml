@@ -29,26 +29,26 @@ on:
 jobs:
   release:
 #    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
+#        os: [ubuntu-latest]
     steps:
       - name : GITHUB CONTEXT
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: Checking out - (${{ matrix.os }})
+      - name: Checking out
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
           submodules: true
-      - name: Submodules Sync - (${{ matrix.os }})
+      - name: Submodules Sync
         shell: bash
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
-      - name: Gpg initialization - (${{ matrix.os }})
+      - name: Gpg initialization 
         shell: bash
         run: |
           echo "GnuGpg initialization step ..."
@@ -70,21 +70,16 @@ jobs:
           git config user.name "${{ secrets.GH_USER }}"
           git config user.email "${{ secrets.GH_USER_EMAIL }}"
           git config credential.helper "store --file=.git/credentials"
-          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
-      - name: Create & Release To (Github Registry & Docker Hub) - (${{ matrix.os }})
+          echo "https://${{ secrets.GH_TOKEN }}:@github.com" > .git/credentials
+
+      - name: Create & Release To (Github Registry & Docker Hub)
         env:
-          GH_USER: ${{ secrets.GH_USER }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_USER: ${{ secrets.GH_USER }}
           GITHUB_USERNAME: ${{ secrets.GH_USER }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           echo "========"
-#          ./.release/release.sh --api --profile="github,release,-sonatype;sonatype,release,-license,-license" \
-#            --setting-file=$(pwd)/.mvn/settings.xml --varg="-Dfindbugs.skip=true" \
-#            --release-branch=release
 
 #      - name: Create Release
 #        id: create_release

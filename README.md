@@ -54,7 +54,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Stanislas Koffi ASSOUTOVI** - *Initial work* - [Nuxeo-sdk](https://github.com/stanislaska)
+* **Stanislas Koffi ASSOUTOVI** - *Initial work* - [nuxeo-sdk](https://github.com/stanislaska)
 
 See also the list of [contributors](https://github.com/djanta/docker-nuxeo-sdk/contributors) who 
 participated in this project.

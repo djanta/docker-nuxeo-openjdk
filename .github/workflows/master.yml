@@ -14,27 +14,23 @@
 # limitations under the License.
 #
 
-name: Build
+name: Snapshot
 
 # On push event ...
 on:
   # Trigger the workflow on push or pull request, but only for the master branch
   push:
     branches:
-      - develop
+      - master
   pull_request:
     branches:
-      - develop
+      - master
 jobs:
   build:
-#    runs-on: ${{ matrix.os }}
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-#        os: [ubuntu-latest]
         arch: [debian, ubuntu]
-#        fail-fast: false
-#    if: github.event_name == 'push' && startsWith(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     steps:
 #      - name: Check Commit Type
 #        uses: gsactions/commit-message-checker@v1
@@ -56,46 +52,28 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-#      - name: get commit message
-#        run: |
-#          echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
-      - name: Checking out - (${{ matrix.os }})
+
+      - name: Checking out - (${{ matrix.arch }})
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
           submodules: true
 
-      - name: Submodules Sync - (${{ matrix.os }})
+      - name: Submodules Sync - (${{ matrix.arch }})
         shell: bash
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
 
-      - name: GitHub credentials configuration - ${{ matrix.os }}
+      - name: GitHub credentials configuration - ${{ matrix.arch }}
         shell: bash
         run: |
           git config user.name "${{ secrets.GH_USER }}"
-#          git config user.email "${{ secrets.GH_USER_EMAIL }}"
-#          git config credential.helper "store --file=.git/credentials"
-#          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
+          git config user.email "${{ secrets.GH_USER_EMAIL }}"
+          git config credential.helper "store --file=.git/credentials"
+          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
 
-#      - name: Increment Step Patch
-#        id: increment-semver-patch
-#        uses: Benbentwo/increment-semver@master
-#        with:
-#          version-level: '-M'
-
-      - name: Update version
-        id: version
-        run: |
-          echo "GITHUB_REF is a tag you set for the release"
-          echo "Your GitHub ref: ${GITHUB_REF}"
-          VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
-          echo "Preparing version ${VERSION}"
-          echo "__version__ = \"${VERSION}\"" > __version__.py
-          echo "##[set-output name=version;]$(echo ${VERSION})"
-
-      - name: Docker Build Image - ${{ matrix.os }}
+      - name: Build Image & Deploy develop tag - ${{ matrix.arch }}
         env:
           GH_USER: ${{ secrets.GH_USER }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -112,10 +90,22 @@ jobs:
           GITHUB_REGISTRY: docker.pkg.github.com
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
         run: |
-          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }} \
+          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }}:devlop \
             --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
             --build-arg BUILD_HASH=$(git rev-parse HEAD) \
             --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
-          
+            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .     
+  snapshot:
+    needs: [build]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+#        arch: [debian, ubuntu]
+    steps:
+      - name : GITHUB CONTEXT
+    env:
+      GITHUB_CONTEXT: ${{ toJson(github) }}
+    run: |
+      echo "=============== Snapshot ==============="
+      docker images
