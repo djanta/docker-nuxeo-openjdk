@@ -92,8 +92,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-          ACCOUNT_ID: ${ACCOUNT_ID:-djanta}
           PROJECT_ID: nuxeo-sdk
+          ACCOUNT_ID: djanta
           IMAGE_BASE: $ACCOUNT_ID/$PROJECT_ID
           IMAGE_TAG: $IMAGE_BASE:$VERSION
           GITHUB_IMAGE_TAG: $PROJECT_ID:$VERSION
