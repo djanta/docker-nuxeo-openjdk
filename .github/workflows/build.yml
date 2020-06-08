@@ -140,7 +140,7 @@ jobs:
             [1]: https://github.com/djanta/create-pull-request
           labels: report, automated pr
           assignees: stanislaska
-          reviewers: stanislaska, djantaio
+          reviewers: stanislaska
           team-reviewers: owners, maintainers
           milestone: 1
           draft: false
