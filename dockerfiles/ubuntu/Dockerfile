@@ -2,16 +2,8 @@ FROM ubuntu:xenial
 
 # Declaring expected external variable
 ARG BUILD_VERSION
-ARG RELEASE_VERSION="$(date -u +'%y.%m')"
-
-RUN echo "Oh dang look at that: $BUILD_VERSION"
-
-# Internal variable overiding ...
-ARG BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-#ARG BUILD_VERSION="$(date -u +'%y.%m')"
-#ARG RELEASE_VERSION="$(date -u +'%y.%m')"
-ARG LAST_COMMIT="$(git rev-parse HEAD)"
-ARG BUILD_HASH="$LAST_COMMIT"
+ARG RELEASE_VERSION
+ARG BUILD_DATE
 
 LABEL description="DJANTA.IO Nuxeo SDK Base image share across all over any specific nuxeo version distribution"
 LABEL version="$BUILD_VERSION"

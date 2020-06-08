@@ -102,5 +102,9 @@ jobs:
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
         run: |
           docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }} \
+            --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
+            --build-arg BUILD_HASH=$(git rev-parse HEAD) \
+            --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
+            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
           

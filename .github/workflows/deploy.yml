@@ -28,7 +28,6 @@ jobs:
     runs-on: ${{ matrix.os }}
   dockerhub:
     needs: [local]
-    runs-on: ${{ matrix.os }}
  #    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
     runs-on: ${{ matrix.os }}
     strategy:
