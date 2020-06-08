@@ -27,6 +27,8 @@ ENV DEBIAN_FRONTEND noninteractive
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.12
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 #=====================
 # Updates for debconf
 # Prevent message 'debconf: unable to initialize frontend: Dialog'
@@ -34,10 +36,8 @@ ENV GOSU_VERSION 1.12
 #=====================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-# Activate the debug option
 RUN set -x \
-	&& apt-get update -y \
-	&& apt-get install software-properties-common -y \
+	&& apt-get update apt-get install software-properties-common -y \
 	# Required in order to install (ufraw)
 	&& add-apt-repository ppa:dhor/myway -y \
 	# Required in order to install (jq)
@@ -48,7 +48,7 @@ RUN set -x \
 	apt-transport-https \
 	ca-certificates wget \
 	inotify-tools \
-  	net-tools \
+  net-tools \
 	gzip \
 	gnupg2 \
 	dirmngr \

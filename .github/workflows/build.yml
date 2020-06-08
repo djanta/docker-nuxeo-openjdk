@@ -27,14 +27,10 @@ on:
       - develop
 jobs:
   build:
-#    runs-on: ${{ matrix.os }}
-    runs-on: "ubuntu-latest"
+    runs-on: 'ubuntu-latest'
     strategy:
       matrix:
-#        os: [ubuntu-latest]
         arch: [debian, ubuntu]
-#        fail-fast: false
-#    if: github.event_name == 'push' && startsWith(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     steps:
 #      - name: Check Commit Type
 #        uses: gsactions/commit-message-checker@v1
@@ -75,52 +71,74 @@ jobs:
         shell: bash
         run: |
           git config user.name "${{ secrets.GH_USER }}"
-#          git config user.email "${{ secrets.GH_USER_EMAIL }}"
-#          git config credential.helper "store --file=.git/credentials"
-#          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
+          git config user.email "${{ secrets.GH_USER_EMAIL }}"
+          git config credential.helper "store --file=.git/credentials"
+          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
 
-#      - name: Increment Step Patch
-#        id: increment-semver-patch
-#        uses: Benbentwo/increment-semver@master
-#        with:
-#          version-level: '-M'
+#      - name: Docker Build Image - ${{ matrix.os }}
+#        env:
+#          GH_USER: ${{ secrets.GH_USER }}
+#          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+#          GITHUB_USERNAME: ${{ secrets.GH_USER }}
+#          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#
+#          PROJECT_ID: nuxeo-sdk
+#          ACCOUNT_ID: djanta
+#          IMAGE_BASE: $ACCOUNT_ID/$PROJECT_ID
+#          IMAGE_TAG: $IMAGE_BASE:$VERSION
+#          GITHUB_IMAGE_TAG: $PROJECT_ID:$VERSION
+#          GITHUB_IMAGE_BRANCH: $GITHUB_IMAGE_TAG-$TRAVIS_BRANCH
+#          GITHUB_REGISTRY: docker.pkg.github.com
+#          GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
+#        run: |
+#          echo "Refactored version: ${{ steps.version.outputs.rversion }}"
+#          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }} \
+#            --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
+#            --build-arg BUILD_HASH=$(git rev-parse HEAD) \
+#            --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
+#            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+#            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 
-      - name: Update version
-        id: version
-        run: |
-          echo "GITHUB_REF is a tag you set for the release"
-          echo "Your GitHub ref: ${GITHUB_REF}"
-          VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
-          echo "Preparing version: ${VERSION}"
-          echo "__version__ = \"${VERSION}\"" > __version__.py
-          echo "##[set-output name=version;]$(echo ${VERSION})"
-
-          if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo ::set-output name=rversion::$(date -u +'%y.%m')
-              echo "==========================="
-          fi
-
-      - name: Docker Build Image - ${{ matrix.os }}
+      - name: Dockerfile lint
+        uses: luke142367/Docker-Lint-Action@v1.0.0
         env:
-          GH_USER: ${{ secrets.GH_USER }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITHUB_USERNAME: ${{ secrets.GH_USER }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET: $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile
 
-          PROJECT_ID: nuxeo-sdk
-          ACCOUNT_ID: djanta
-          IMAGE_BASE: $ACCOUNT_ID/$PROJECT_ID
-          IMAGE_TAG: $IMAGE_BASE:$VERSION
-          GITHUB_IMAGE_TAG: $PROJECT_ID:$VERSION
-          GITHUB_IMAGE_BRANCH: $GITHUB_IMAGE_TAG-$TRAVIS_BRANCH
-          GITHUB_REGISTRY: docker.pkg.github.com
-          GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
-        run: |
-          echo "Refactored version: ${{ steps.version.outputs.rversion }}"
-          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }} \
-            --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
-            --build-arg BUILD_HASH=$(git rev-parse HEAD) \
-            --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
+      - name: Hadolint lint
+        uses: burdzwastaken/hadolint-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HADOLINT_ACTION_COMMENT: false
+          HADOLINT_ACTION_DOCKERFILE_FOLDER: $(pwd)/dockerfiles/${{ matrix.arch }}
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "[WIP] - PR after passing ${GITHUB_REF} build"
+          committer: ${{ github.event.head_commit.committer.name }} <${{ github.event.head_commit.committer.email }}>
+          author: ${{ github.event.pusher.name }} <${{ github.event.pusher.email }}>
+          title: '[PR: #${{ github.run_number }}] from ${{ github.ref }} by (${{ github.event.head_commit.committer.name }}) - https://github.com/${{ github.event.head_commit.committer.username }}'
+          body: |
+            - ${{ github.event.head_commit.message }}
+            - Auto-generated by [create-pull-request][1]
+            [1]: https://github.com/$GITHUB_REPOSITORY/pull
+          labels: pr
+          assignees: stanislaska
+          reviewers: stanislaska
+          team-reviewers: owners, maintainers
+#          milestone: 1
+          draft: false
+          branch: master
+          request-to-parent: false
+
+#      - name: Create or Update Project Card
+#        uses: peter-evans/create-or-update-project-card@v1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          project-name: Cloud
+#          column-name: To do
+#          issue-number: ${{ steps.cpr.outputs.pull-request-number }}

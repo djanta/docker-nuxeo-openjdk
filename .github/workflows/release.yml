@@ -48,7 +48,7 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
-      - name: Gpg initialization 
+      - name: Gpg initialization
         shell: bash
         run: |
           echo "GnuGpg initialization step ..."
@@ -72,6 +72,19 @@ jobs:
           git config credential.helper "store --file=.git/credentials"
           echo "https://${{ secrets.GH_TOKEN }}:@github.com" > .git/credentials
 
+      - name: Update or Create version ID
+        id: version
+        run: |
+          echo "GITHUB_REF is a tag you set for the release"
+          echo "Your GitHub ref: ${GITHUB_REF}"
+          VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
+          echo "Preparing version: ${VERSION}"
+          echo "__version__ = \"${VERSION}\"" > __version__.py
+          echo "##[set-output name=version;]$(echo ${VERSION})"
+
+          if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=rversion::$(date -u +'%y.%m')
+          fi
       - name: Create & Release To (Github Registry & Docker Hub)
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -81,7 +94,7 @@ jobs:
         run: |
           echo "========"
 
-#      - name: Create Release
+#      - name: Create Github Release
 #        id: create_release
 #        uses: actions/create-release@latest
 #        env:
