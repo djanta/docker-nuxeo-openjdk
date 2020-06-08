@@ -1,16 +1,16 @@
 # docker-nuxeo-sdk
-=====================================
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/djanta/docker-nuxeo-sdk)
+[![pull badge](https://img.shields.io/docker/pulls/djanta/nuxeo-sdk.svg)](https://github.com/djanta/docker-nuxeo-sdk)
+[![stars badge](https://img.shields.io/docker/stars/djanta/nuxeo-sdk.svg)](https://github.com/djanta/docker-nuxeo-sdk)
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/djanta/nuxeo-sdk)
 
-[![build status badge](https://img.shields.io/travis/djantaio/docker-nuxeo-sdk/master.svg)](https://travis-ci.org/djantaio/docker-nuxeo-sdk/branches)
-
-A one paragraph description about the container.
+> 1.0.0
 
 ## Getting Started
 
 These instructions will cover usage information and for the docker container 
 
 ### Prerequisities
-
 
 In order to run this container you'll need docker installed.
 
@@ -20,56 +20,32 @@ In order to run this container you'll need docker installed.
 
 ### Usage
 
-#### Container Parameters
+#### Start Container Parameters
 
 List the different parameters available to your container
 
-```shell
-docker run give.example.org/of/your/container:v0.2.1 parameters
-```
-
-One example per permutation 
-
-```shell
-docker run give.example.org/of/your/container:v0.2.1
-```
+####  Interacting with your container
 
 Show how to get a shell started in your container too
 
-```shell
-docker run give.example.org/of/your/container:v0.2.1 bash
-```
+or by running docker exec
 
-#### Environment Variables
+#### Stop Container Parameters
 
-* `VARIABLE_ONE` - A Description
-* `ANOTHER_VAR` - More Description
-* `YOU_GET_THE_IDEA` - And another
-
-#### Volumes
-
-* `/your/file/location` - File location
-
-#### Useful File Locations
-
-* `/some/special/script.sh` - List special scripts
-  
-* `/magic/dir` - And also directories
+Show how to get a stop in your container
 
 ## Built With
 
-* List the software v0.1.3
-* And the version numbers v2.0.0
-* That are in this container v0.3.2
+* debian:jessie-slim:latest
+* gosu v1.10
 
 ## Find Us
 
-* [GitHub](https://github.com/your/repository)
-* [Quay.io](https://quay.io/repository/your/docker-repository)
+* [GitHub](https://github.com/djanta/docker-nuxeo-sdk)
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://github.com/djanta/docker-nuxeo-sdk/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
@@ -78,16 +54,11 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Stanislas Koffi ASSOUTOVI** - *Initial work* - [Nuxeo-sdk](https://github.com/stanislaska)
 
-See also the list of [contributors](https://github.com/your/repository/contributors) who 
+See also the list of [contributors](https://github.com/djanta/docker-nuxeo-sdk/contributors) who 
 participated in this project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Acknowledgments
-
-* People you want to thank
-* If you took a bunch of code from somewhere list it here
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/djanta/docker-nuxeo-sdk/blob/master/LICENSE) file for details.
