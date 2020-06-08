@@ -1,4 +1,4 @@
-FROM debian:10.4-slim
+FROM alpine:3.12.0
 
 # Declaring expected external variable
 ARG BUILD_VERSION
@@ -27,34 +27,41 @@ ENV DEBIAN_FRONTEND noninteractive
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.12
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+#SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 #=====================
 # Updates for debconf
 # Prevent message 'debconf: unable to initialize frontend: Dialog'
 # Prevent message 'debconf: delaying package configuration, since apt-utils is not installed'
 #=====================
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+#RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-# testing online: https://hadolint.github.io/hadolint/
+#Pakages: https://pkgs.alpinelinux.org/packages
+
+RUN cat /etc/apk/repositories
+
 # hadolint ignore=SC2155,DL3008
 RUN set -x \
-	&& apt-get update && apt-get install -y \
-	apt-utils \
-	apt-transport-https \
-	ca-certificates wget \
+	&& apk update \
+	# Required in order to install (ufraw)
+#	&& apk --repository ppa:dhor/myway \
+	&& apk add --update --no-cache \
+#	apt-utils \
+#	apt-transport-https \
+	ca-certificates \
+	wget \
 	inotify-tools \
   net-tools \
 	gzip \
-	gnupg2 \
-	dirmngr \
+	gnupg \
+#	dirmngr \
 	perl \
-	handbrake \
+#	handbrake \
 	imagemagick \
 	pwgen \
-	ffmpeg2theora \
+#	ffmpeg2theora \
 	ffmpeg \
-	ufraw \
+#	ufraw \
 	x264 \
 	libreoffice \
 	ghostscript \
@@ -62,16 +69,15 @@ RUN set -x \
 	poppler-utils \
 	libwpd-tools \
 	&& rm -rf /var/lib/apt/lists/* \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true \
-# Purge & remove unnecessary dependencies ....
-	&& apt-get purge -y --auto-remove ca-certificates wget
+#	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+#	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+#	&& export GNUPGHOME="$(mktemp -d)" \
+#	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+#	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+#	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
+#	&& chmod +x /usr/local/bin/gosu \
+#	&& gosu nobody true \
+	&& apk del --purge ca-certificates wget
 
 # enabling utf-8 by default
 ENV LANG en_US.utf8
