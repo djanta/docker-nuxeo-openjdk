@@ -101,10 +101,6 @@ jobs:
           GITHUB_REGISTRY: docker.pkg.github.com
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
         run: |
-          echo "Account ID: $ACCOUNT_ID"
-          echo "Base ID: $IMAGE_BASE"
-          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
-#          echo "The new patch version was ${{ steps.increment-semver-patch.outputs.version }}"
-#          echo "The new minor version was ${{ steps.increment-semver-minor.outputs.version }}"
-#          echo "The new Major version was ${{ steps.increment-semver-major.outputs.version }}"
-#          echo "The new version was ${{ steps.increment-semver-major.outputs }}"
+          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }} \
+            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
+          
