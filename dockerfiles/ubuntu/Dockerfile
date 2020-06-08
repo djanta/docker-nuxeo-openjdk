@@ -4,6 +4,7 @@ FROM ubuntu:xenial
 ARG BUILD_VERSION
 ARG RELEASE_VERSION
 ARG BUILD_DATE
+ARG BUILD_HASH
 
 LABEL description="DJANTA.IO Nuxeo SDK Base image share across all over any specific nuxeo version distribution"
 LABEL version="$BUILD_VERSION"

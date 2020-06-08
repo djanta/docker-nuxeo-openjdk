@@ -19,14 +19,19 @@ name: Deploy
 on:
   create:
     tags:
-      - /^((rc|v|version|release|tag)(-)?)?([0-9\.]+)((-)?(patch|beta|alpha))?$/
+#      - /^((rc|v|version|release|tag)(-)?)?([0-9\.]+)((-)?(patch|beta|alpha))?$/
+      - 'v*.*.*'
+      - 'release*.*.*'
+      - 'tag*.*.*'
     branches:
       - 'refs/tags/*'
       - '!refs/heads/*'
 jobs:
   publish:
-    needs: [local]
- #    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
+#    if: (${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]])
+    if: (${{ github.event.ref }} =~ ^((rc|v|version|release|tag)(-)?)?([0-9\.]+)((-)?(patch|beta|alpha))?$ ]])
+#    needs: [local]
+#    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -59,13 +59,13 @@ jobs:
 #      - name: get commit message
 #        run: |
 #          echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
-      - name: Checking out - (${{ matrix.os }})
+      - name: Checking out
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
           submodules: true
 
-      - name: Submodules Sync - (${{ matrix.os }})
+      - name: Submodules Sync
         shell: bash
         run: |
           git submodule sync --recursive
@@ -94,6 +94,12 @@ jobs:
           echo "Preparing version ${VERSION}"
           echo "__version__ = \"${VERSION}\"" > __version__.py
           echo "##[set-output name=version;]$(echo ${VERSION})"
+
+          if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=rversion::$(date -u +'%y.%m')
+          fi
+
+          echo "Refactored version version ${{ steps.version.outputs.rversion }}"
 
       - name: Docker Build Image - ${{ matrix.os }}
         env:

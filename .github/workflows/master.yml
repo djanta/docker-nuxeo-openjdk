@@ -104,8 +104,8 @@ jobs:
 #        arch: [debian, ubuntu]
     steps:
       - name : GITHUB CONTEXT
-    env:
-      GITHUB_CONTEXT: ${{ toJson(github) }}
-    run: |
-      echo "=============== Snapshot ==============="
-      docker images
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "=============== Snapshot ==============="
+          docker images
