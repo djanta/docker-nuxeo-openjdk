@@ -36,6 +36,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 #=====================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+# hadolint ignore=SC2155,DL3008
 RUN set -x \
 	&& apt-get update apt-get install software-properties-common -y \
 	# Required in order to install (ufraw)
