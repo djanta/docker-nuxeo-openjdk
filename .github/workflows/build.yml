@@ -131,7 +131,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "[WIP] - PR after passing develop branch build test"
-          committer: GitHub <noreply@github.com>
+          committer: GitHub ${{ github.head_commit.committer.email }}
           author: ${{ github.actor }} ${{ github.pusher.email }}
           title: '[WIP] PR for master merge from ${{ github.ref }} by (${{ github.head_commit.committer.name }}) - https://github.com/${{ github.head_commit.committer.username }}'
           body: |
