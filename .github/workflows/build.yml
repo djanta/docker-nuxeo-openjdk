@@ -91,15 +91,14 @@ jobs:
           echo "GITHUB_REF is a tag you set for the release"
           echo "Your GitHub ref: ${GITHUB_REF}"
           VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
-          echo "Preparing version ${VERSION}"
+          echo "Preparing version: ${VERSION}"
           echo "__version__ = \"${VERSION}\"" > __version__.py
           echo "##[set-output name=version;]$(echo ${VERSION})"
 
           if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo ::set-output name=rversion::$(date -u +'%y.%m')
+              echo "==========================="
           fi
-
-          echo "Refactored version version ${{ steps.version.outputs.rversion }}"
 
       - name: Docker Build Image - ${{ matrix.os }}
         env:
@@ -118,6 +117,7 @@ jobs:
           GITHUB_REGISTRY: docker.pkg.github.com
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
         run: |
+          echo "Refactored version: ${{ steps.version.outputs.rversion }}"
           docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }} \
             --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
             --build-arg BUILD_HASH=$(git rev-parse HEAD) \
