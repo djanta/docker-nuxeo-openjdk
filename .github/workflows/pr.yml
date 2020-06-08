@@ -87,10 +87,10 @@ jobs:
           branch: master
           request-to-parent: false
 
-      - name: Create or Update Project Card
-        uses: peter-evans/create-or-update-project-card@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          project-name: Cloud
-          column-name: To do
-          issue-number: ${{ steps.cpr.outputs.pull-request-number }}
+#      - name: Create or Update Project Card
+#        uses: peter-evans/create-or-update-project-card@v1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          project-name: Cloud
+#          column-name: To do
+#          issue-number: ${{ steps.cpr.outputs.pull-request-number }}
