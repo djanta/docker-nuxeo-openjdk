@@ -94,14 +94,16 @@ jobs:
 
           ACCOUNT_ID: ${ACCOUNT_ID:-djanta}
           PROJECT_ID: nuxeo-sdk
-          IMAGE_BASE: "${ACCOUNT_ID}/${PROJECT_ID}"
-          IMAGE_TAG: "${IMAGE_BASE}:$VERSION"
-          GITHUB_IMAGE_TAG: "${PROJECT_ID}:${VERSION}"
-          GITHUB_IMAGE_BRANCH: "${GITHUB_IMAGE_TAG}-${TRAVIS_BRANCH}"
+          IMAGE_BASE: ${ACCOUNT_ID}/${PROJECT_ID}
+          IMAGE_TAG: ${IMAGE_BASE}:$VERSION
+          GITHUB_IMAGE_TAG: ${PROJECT_ID}:${VERSION}
+          GITHUB_IMAGE_BRANCH: ${GITHUB_IMAGE_TAG}-${TRAVIS_BRANCH}
           GITHUB_REGISTRY: docker.pkg.github.com
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
         run: |
-          docker --debug build -t $IMAGE_BASE --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
+          echo "Account ID: $ACCOUNT_ID"
+          echo "Base ID: $IMAGE_BASE"
+          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 #          echo "The new patch version was ${{ steps.increment-semver-patch.outputs.version }}"
 #          echo "The new minor version was ${{ steps.increment-semver-minor.outputs.version }}"
 #          echo "The new Major version was ${{ steps.increment-semver-major.outputs.version }}"
