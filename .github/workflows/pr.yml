@@ -82,7 +82,7 @@ jobs:
           assignees: stanislaska
           reviewers: stanislaska
           team-reviewers: owners, maintainers
-          milestone: 1
+#          milestone: 1
           draft: false
           branch: master
           request-to-parent: false
