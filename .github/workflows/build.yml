@@ -100,11 +100,11 @@ jobs:
 #            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
 #            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 
-      - name: Dockerfile lint
-        uses: luke142367/Docker-Lint-Action@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET: $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile
+#      - name: Dockerfile lint
+#        uses: luke142367/Docker-Lint-Action@v1.0.0
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          TARGET: $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile
 
       - name: Hadolint lint
         uses: burdzwastaken/hadolint-action@master
