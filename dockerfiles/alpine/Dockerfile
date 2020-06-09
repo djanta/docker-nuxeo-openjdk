@@ -1,3 +1,4 @@
+# vim:set ft=dockerfile:
 FROM alpine:3.12.0
 
 # Declaring expected external variable

@@ -1,3 +1,4 @@
+# vim:set ft=dockerfile:
 FROM debian:10.4-slim
 
 # Declaring expected external variable
