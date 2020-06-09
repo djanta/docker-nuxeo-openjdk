@@ -38,13 +38,13 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # hadolint ignore=SC2155,DL3008
 RUN set -x \
-	&& apt-get update && apt-get install -y software-properties-common --no-install-recommends \
+	&& apt-get update && apt-get install -y software-properties-common \
 	# Required in order to install (ufraw)
 	&& add-apt-repository ppa:dhor/myway -y \
 	# Required in order to install (jq)
 #	&& add-apt-repository ppa:rmescandon/yq -y \
 #	&& apt-get update \
-	&& apt-get install -y --no-install-recommends \
+	&& apt-get install -y \
 	apt-utils \
 	apt-transport-https \
 	ca-certificates wget \
