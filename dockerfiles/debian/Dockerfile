@@ -37,6 +37,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # testing online: https://hadolint.github.io/hadolint/
+
 # hadolint ignore=SC2155,DL3008
 RUN set -x \
 	&& apt-get update && apt-get install -y \
