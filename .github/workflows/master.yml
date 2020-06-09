@@ -125,7 +125,7 @@ jobs:
           team-reviewers: owners, maintainers
 #          milestone: 1
           draft: false
-          branch: create-pull-request/patch
+          branch: patch
           request-to-parent: false
           branch-suffix: short-commit-hash
 
