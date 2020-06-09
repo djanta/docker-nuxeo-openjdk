@@ -15,29 +15,23 @@
 #
 
 name: Release
-
-# On push event ...
 on:
-  # Trigger the workflow on push or pull request, but only for the master branch
   push:
     branches:
       - release
-#    tags:
-#      - /^((rc|v|version|release|tag)(-)?)?([0-9\.]+)((-)?(patch|beta|alpha))?$/
-# Push events to v1 tag
-
 jobs:
   release:
 #    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-#        os: [ubuntu-latest]
+        os: [ubuntu-latest]
     steps:
-      - name : GITHUB CONTEXT
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+#      - name : GITHUB CONTEXT
+#        env:
+#          GITHUB_CONTEXT: ${{ toJson(github) }}
+#        run: echo "$GITHUB_CONTEXT"
+
       - name: Checking out
         uses: actions/checkout@v2
         with:
@@ -48,22 +42,7 @@ jobs:
         run: |
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
-      - name: Gpg initialization
-        shell: bash
-        run: |
-          echo "GnuGpg initialization step ..."
-          TMPDIR=${TMPDIR:-$(dirname $(mktemp))}
-          KEYSTORE=${KEYSTORE:-$TMPDIR/.keystore}
-          IN_PUB=$(pwd)/.gnugp/deploy/pubring.gpg.asc
-          IN_PRV=$(pwd)/.gnugp/deploy/secring.gpg.asc
-          OUT_PUB=$KEYSTORE/pubring.gpg.enc
-          OUT_PRV=$KEYSTORE/secring.gpg.enc
-          mkdir -pv $KEYSTORE
-          gpg --decrypt --yes --batch --passphrase=${{ secrets.GPG_MASTER_PASSWORD }} --output=$OUT_PUB $IN_PUB
-          gpg --decrypt --yes --batch --passphrase=${{ secrets.GPG_MASTER_PASSWORD }} --output=$OUT_PRV $IN_PRV
-          gpg --yes --batch --import $OUT_PUB >/dev/null 2>&1;
-          gpg --yes --batch --import $OUT_PRV >/dev/null 2>&1;
-          rm -rfv $KEYSTORE
+
       - name: GitHub credentials configuration - (${{ matrix.os }})
         shell: bash
         run: |
@@ -72,7 +51,15 @@ jobs:
           git config credential.helper "store --file=.git/credentials"
           echo "https://${{ secrets.GH_TOKEN }}:@github.com" > .git/credentials
 
-      - name: Update or Create version ID
+#      - name: Increment Step Major
+#        id: increment-semver-major
+#        uses: Benbentwo/increment-semver@master
+#        with:
+#          version-level: '-M'
+
+      - name: Create or Update version ID
+#        # if repvious increment-semver-major step failed
+#        if: ${{ failure() }}
         id: version
         run: |
           echo "GITHUB_REF is a tag you set for the release"
@@ -82,8 +69,9 @@ jobs:
           echo "__version__ = \"${VERSION}\"" > __version__.py
           echo "##[set-output name=version;]$(echo ${VERSION})"
 
+          echo ::set-env name=version::${VERSION})
           if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo ::set-output name=rversion::$(date -u +'%y.%m')
+              echo ::set-output name=version::$(date -u +'%y.%m')
           fi
       - name: Create & Release To (Github Registry & Docker Hub)
         env:
@@ -92,16 +80,21 @@ jobs:
           GITHUB_USERNAME: ${{ secrets.GH_USER }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          echo "========"
+          echo "Create & Release To (Github Registry & Docker Hub)"
+
+      - name: Get Changelog
+        id: changelog
+        run: |
+          echo "::set-output name=CHANGELOG::$(cat CHANGELOG.md)"
 
 #      - name: Create Github Release
-#        id: create_release
+#        id: release
 #        uses: actions/create-release@latest
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
 #        with:
-#          tag_name: ${{ steps.increment-semver-patch.outputs.version }}
-#          release_name: Release v${{ steps.increment-semver-patch.outputs.version }}
+#          tag_name: ${{ steps.version.outputs.version }}
+#          release_name: Release v${{ steps.version.outputs.version }}
 #          body: |
 #            #### Changes in this Release:
 #            ${{ steps.changelog.outputs.CHANGELOG }}
