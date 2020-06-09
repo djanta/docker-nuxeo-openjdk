@@ -39,7 +39,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # testing online: https://hadolint.github.io/hadolint/
 
-# hadolint ignore=SC2155,DL3008
+# hadolint ignore=SC2155,DL3008,DL3015
 RUN set -x \
 	&& apt-get update && apt-get install -y \
 	apt-utils \

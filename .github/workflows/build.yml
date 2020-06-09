@@ -131,7 +131,7 @@ jobs:
           reviewers: stanislaska
           team-reviewers: owners, maintainers
 #          milestone: 1
-          draft: false
+          draft: true
           branch: master
           request-to-parent: false
 
