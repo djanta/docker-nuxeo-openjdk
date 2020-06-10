@@ -90,7 +90,7 @@ jobs:
           GITHUB_REGISTRY: docker.pkg.github.com
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
         run: |
-          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }}:devlop \
+          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }}:develop \
             --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
             --build-arg BUILD_HASH=$(git rev-parse HEAD) \
             --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
@@ -101,12 +101,9 @@ jobs:
 
       - name: Run Gitrivy Vulnerability check
         uses: homoluctus/gitrivy@v1.0.0
-        env:
-          PROJECT_ID: nuxeo-sdk
-          ACCOUNT_ID: djanta
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          image: $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }}:devlop
+          image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
 
 #      - name: Create Pull Request
 #        id: cpr
