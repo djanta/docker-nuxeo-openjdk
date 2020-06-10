@@ -67,7 +67,6 @@ RUN set -x \
 	exiftool \
 	poppler-utils \
 	libwpd-tools \
-	&& rm -rf /var/lib/apt/lists/* \
 	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
 	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
@@ -76,6 +75,7 @@ RUN set -x \
 	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
+#	&& rm -rf /var/lib/apt/lists/* \
 	&& apt-get purge -y -f --auto-remove ca-certificates wget
 
 # enabling utf-8 by default
