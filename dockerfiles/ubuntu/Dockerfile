@@ -39,7 +39,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # hadolint ignore=SC2155,DL3008,DL3015
 RUN set -x \
-	&& apt-get update && apt-get install -y software-properties-common \
+	&& apt-get update && apt-get install -y software-properties-common --no-install-recommends \
 	# Required in order to install (ufraw)
 	&& add-apt-repository ppa:dhor/myway -y \
 	# Required in order to install (jq)
@@ -76,7 +76,8 @@ RUN set -x \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
 #	&& rm -rf /var/lib/apt/lists/* \
-	&& apt-get purge -y -f --auto-remove ca-certificates wget
+	&& apt-get purge -y -f --auto-remove ca-certificates wget \
+  && apt-get autoremove
 
 # enabling utf-8 by default
 ENV LANG en_US.utf8
