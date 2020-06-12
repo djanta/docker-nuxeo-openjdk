@@ -66,12 +66,12 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
 
-      - name: 'Checkout (docker-library/official-images)'
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.PAT }}
-          repository: docker-library/official-images
-          path: ~/official-images
+#      - name: 'Checkout (docker-library/official-images)'
+#        uses: actions/checkout@v2
+#        with:
+#          token: ${{ secrets.GH_USER }}
+#          repository: docker-library/official-images
+#          path: ~/official-images
 
       - name: GitHub credentials configuration - ${{ matrix.arch }}
         shell: bash
@@ -105,7 +105,7 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 
-          ~/official-images/test/run.sh $image_id
+#          ~/official-images/test/run.sh $image_id
 
       - name: Run Gitrivy Vulnerability check
         uses: homoluctus/gitrivy@v1.0.0
