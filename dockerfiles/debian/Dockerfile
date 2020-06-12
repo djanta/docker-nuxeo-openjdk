@@ -45,6 +45,7 @@ RUN set -x \
 #	&& apt-get dist-upgrade -y \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
+  locales \
 	apt-utils \
 	apt-transport-https \
 	ca-certificates wget \
@@ -67,7 +68,6 @@ RUN set -x \
 	poppler-utils \
 	libwpd-tools
 
-# \
 #	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 #	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
 #	&& export GNUPGHOME="$(mktemp -d)" \
@@ -100,6 +100,9 @@ RUN set -x \
 # Purge & remove unnecessary dependencies ....
 RUN apt-get purge -y -f --auto-remove ca-certificates wget \
     && apt-get autoremove
+
+RUN rm -rf /var/lib/apt/lists/* \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 RUN dpkg -l
 
