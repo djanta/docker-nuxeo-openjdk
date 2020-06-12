@@ -80,6 +80,8 @@ RUN set -x \
 #	&& gosu nobody true \
 	&& apk del --purge ca-certificates wget
 
+RUN apk info -vv
+
 # enabling utf-8 by default
 ENV LANG en_US.utf8
 

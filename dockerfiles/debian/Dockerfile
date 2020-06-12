@@ -109,6 +109,8 @@ RUN set -x \
 RUN apt-get purge -y -f --auto-remove ca-certificates wget \
     && apt-get autoremove
 
+RUN dpkg -l
+
 # enabling utf-8 by default
 ENV LANG en_US.utf8
 

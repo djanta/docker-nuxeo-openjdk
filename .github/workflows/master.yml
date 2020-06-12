@@ -105,10 +105,10 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 
-#          ~/official-images/test/run.sh $image_id
+          ~/official-images/test/run.sh $image_id
 
       - name: Run Gitrivy Vulnerability check
-        uses: homoluctus/gitrivy@v1.0.0
+        uses: homoluctus/gitrivy@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop

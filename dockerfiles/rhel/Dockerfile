@@ -88,6 +88,8 @@ RUN find / -perm 6000 -type f -exec chmod a-s {} \; || true
 # Create Nuxeo user
 RUN useradd -m -d /home/$NUXEO_USER -u 1000 -s /bin/bash $NUXEO_USER
 
+RUN yum list installed
+
 # enabling utf-8 by default
 ENV LANG en_US.utf8
 
