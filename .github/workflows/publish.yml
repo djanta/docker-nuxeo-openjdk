@@ -34,7 +34,7 @@ jobs:
       matrix:
  #       os: [ubuntu-latest]
  #       registry: [/*gcr.io*/ /*,docker.pkg.github.com*/]
-      registry: []
+        registry: []
     steps:
 #      - name : GITHUB CONTEXT
 #        env:
