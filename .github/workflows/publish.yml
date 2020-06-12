@@ -30,11 +30,11 @@ jobs:
   publish:
     if: (${{ github.event.ref }} =~ ^((rc|v|version|release|tag)(-)?)?([0-9\.]+)((-)?(patch|beta|alpha))?$ ]])
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
- #       os: [ubuntu-latest]
- #       registry: [/*gcr.io*/ /*,docker.pkg.github.com*/]
-        registry: []
+#    strategy:
+#      matrix:
+##       os: [ubuntu-latest]
+##       registry: [/*gcr.io*/ /*,docker.pkg.github.com*/]
+#        registry: []
     steps:
 #      - name : GITHUB CONTEXT
 #        env:
@@ -48,11 +48,8 @@ jobs:
           echo "Your GitHub ref: ${GITHUB_REF}"
           VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
 
-#          echo "Preparing version: ${VERSION}"
-#          echo "__version__ = \"${VERSION}\"" > __version__.py
-#          echo "##[set-output name=version;]$(echo ${VERSION})"
-
           echo ::set-env name=version::${VERSION})
+
           if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo ::set-output name=version::$(date -u +'%y.%m')
           fi

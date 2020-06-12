@@ -40,19 +40,10 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # testing online: https://hadolint.github.io/hadolint/
 
-#RUN cat "deb http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list
-#RUN cat "deb http://www.deb-multimedia.org buster-backports main" >> /etc/apt/sources.list
-
 # hadolint ignore=SC2155,DL3008,DL3015
 RUN set -x \
-#  && echo "deb http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list \
-#  && cat /etc/apt/sources.list \
-#	&& apt-get update -oAcquire::AllowInsecureRepositories=true \
-  && apt-get update \
-#  && apt-get install -y --no-install-recommends --allow-unauthenticated deb-multimedia-keyring \
-  && apt-get install -y --no-install-recommends \
 #	&& apt-get dist-upgrade -y \
-#	&& apt-get install -y --no-install-recommends --allow-unauthenticated \
+  && apt-get update \
   && apt-get install -y --no-install-recommends \
 	apt-utils \
 	apt-transport-https \
@@ -74,7 +65,9 @@ RUN set -x \
 	ghostscript \
 	exiftool \
 	poppler-utils \
-	libwpd-tools # \
+	libwpd-tools
+
+# \
 #	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 #	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
 #	&& export GNUPGHOME="$(mktemp -d)" \
@@ -84,6 +77,13 @@ RUN set -x \
 #	&& chmod +x /usr/local/bin/gosu \
 #	&& gosu nobody true
 
+## Start: ffmpeg vulnerability fixing: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-17542
+# Version affected: <= 4.1
+# Version Fix: >= 4.2.0
+# Fix: https://www.deb-multimedia.org/
+# Resolve resource: https://security.gentoo.org/glsa/202003-65
+# Debian version list: http://ftp.debian.org/debian/pool/main/f/ffmpeg/ or https://tracker.debian.org/pkg/ffmpeg
+## END
 #RUN echo "deb http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list \
 #  && echo "deb-src http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list \
 #  && apt-get update -oAcquire::AllowInsecureRepositories=true \
@@ -92,14 +92,6 @@ RUN set -x \
 #  && apt-get install -y --no-install-recommends ffmpeg \
 #  && ffmpeg -version
 
-## Start: ffmpeg vulnerability fixing: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-17542
-# Version affected: <= 4.1
-# Version Fix: >= 4.2.0
-# Fix: https://www.deb-multimedia.org/
-# Resolve resource: https://security.gentoo.org/glsa/202003-65
-# Debian version list: http://ftp.debian.org/debian/pool/main/f/ffmpeg/ or https://tracker.debian.org/pkg/ffmpeg
-#	ffmpeg \
-## END
 #RUN wget -O ~/deb-multimedia-keyring.deb "http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb" \
 #  && wget -O ~/ffmpeg_${FFMPEG_VERSION}.deb "http://ftp.debian.org/debian/pool/main/f/ffmpeg/ffmpeg_${FFMPEG_VERSION}_$(dpkg --print-architecture | awk -F- '{ print $NF }').deb" \
 #  && dpkg -i ~/deb-multimedia-keyring.deb \
