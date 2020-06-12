@@ -66,6 +66,13 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
 
+      - name: 'Checkout (docker-library/official-images)'
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: docker-library/official-images
+          path: ~/official-images
+
       - name: GitHub credentials configuration - ${{ matrix.arch }}
         shell: bash
         run: |
@@ -90,20 +97,23 @@ jobs:
           GITHUB_REGISTRY: docker.pkg.github.com
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
         run: |
-          docker --debug build -t $ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }}:develop \
+          image_id=$ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }}:develop
+          docker --debug build -t $image_id \
             --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
             --build-arg BUILD_HASH=$(git rev-parse HEAD) \
             --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 
-          docker --debug images
+          ~/official-images/test/run.sh $image_id
 
       - name: Run Gitrivy Vulnerability check
         uses: homoluctus/gitrivy@v1.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+          trivy_version: true
+          issue_label: test,report,vulnerability
 
 #      - name: Create Pull Request
 #        id: cpr

@@ -36,7 +36,23 @@ jobs:
  #       registry: [/*gcr.io*/ /*,docker.pkg.github.com*/]
       registry: []
     steps:
-      - name : GITHUB CONTEXT
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+#      - name : GITHUB CONTEXT
+#        env:
+#          GITHUB_CONTEXT: ${{ toJson(github) }}
+#        run: echo "$GITHUB_CONTEXT"
+
+      - name: Create or Update version ID
+        id: version
+        run: |
+          echo "GITHUB_REF is a tag you set for the release"
+          echo "Your GitHub ref: ${GITHUB_REF}"
+          VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
+
+#          echo "Preparing version: ${VERSION}"
+#          echo "__version__ = \"${VERSION}\"" > __version__.py
+#          echo "##[set-output name=version;]$(echo ${VERSION})"
+
+          echo ::set-env name=version::${VERSION})
+          if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=version::$(date -u +'%y.%m')
+          fi

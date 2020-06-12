@@ -18,7 +18,9 @@ name: Vulnerability Scan
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    #DOC: https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
+    #Run everyday at 23:00 of every week
+    - cron: '0 23 * * 6'
 
 jobs:
   scan:
@@ -36,22 +38,20 @@ jobs:
           submodules: true
       - name: Pull docker image
         run: docker pull djanta/nuxeo-sdk-${{ matrix.arch }}:${{ matrix.version }}
+
       - name: Run Gitrivy Vulnerability check
         uses: homoluctus/gitrivy@v1.0.0
-        env:
-          GH_USER: ${{ secrets.GH_USER }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITHUB_USERNAME: ${{ secrets.GH_USER }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          image: djanta/nuxeo-sdk-${{ matrix.arch }}:${{ matrix.version }}
-      - name: Run Anchore Vulnerability check
-        uses: anchore/scan-action@master
-        with:
-          image-reference: djanta/nuxeo-sdk-${{ matrix.arch }}:${{ matrix.version }}
-#          dockerfile-path: "./Dockerfile"
-          fail-build: true
-      - name: Anchore inline scan JSON results
-        run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
+          image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+          trivy_version: true
+          issue_label: test,report,vulnerability
+
+#      - name: Run Anchore Vulnerability check
+#        uses: anchore/scan-action@master
+#        with:
+#          image-reference: djanta/nuxeo-sdk-${{ matrix.arch }}:${{ matrix.version }}
+##          dockerfile-path: "./Dockerfile"
+#          fail-build: true
+#      - name: Anchore inline scan JSON results
+#        run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done

@@ -53,6 +53,7 @@ jobs:
 
 #      - name: Increment Step Major
 #        id: increment-semver-major
+#        fail-fast: false
 #        uses: Benbentwo/increment-semver@master
 #        with:
 #          version-level: '-M'
