@@ -74,15 +74,15 @@ RUN set -x \
 	ghostscript \
 	exiftool \
 	poppler-utils \
-	libwpd-tools \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true
+	libwpd-tools # \
+#	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+#	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
+#	&& export GNUPGHOME="$(mktemp -d)" \
+#	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+#	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+#	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
+#	&& chmod +x /usr/local/bin/gosu \
+#	&& gosu nobody true
 
 #RUN echo "deb http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list \
 #  && echo "deb-src http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list \
