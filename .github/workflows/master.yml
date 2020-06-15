@@ -67,11 +67,14 @@ jobs:
           git submodule update --init --recursive --remote --merge --force --depth=3
 
       - name: 'Checkout (docker-library/official-images)'
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GH_USER }}
-          repository: docker-library/official-images
-          path: ~/official-images
+        shell: bash
+        run: |
+          git clone https://github.com/docker-library/official-images.git ~/official-images
+#        uses: actions/checkout@v2
+#        with:
+#          token: ${{ secrets.GH_USER }}
+#          repository: docker-library/official-images
+#          path: ~/official-images
 
       - name: GitHub credentials configuration - ${{ matrix.arch }}
         shell: bash
