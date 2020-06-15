@@ -106,13 +106,14 @@ jobs:
           git clone https://github.com/docker-library/official-images.git ~/official-images
           ~/official-images/test/run.sh $IMAGE
 
-      - name: Run Snyk to check Docker image for vulnerabilities
+      - name: Snyk vulnerabilities check
         uses: snyk/actions/docker@master
+        fail-fast: false
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
-          args: --severity-threshold=high
+          args: --severity-threshold=high --file=dockerfiles/${{ matrix.arch }}/.vulnerability
 
 #      - name: Run Gitrivy Vulnerability check
 #        uses: homoluctus/gitrivy@v2.0.0
