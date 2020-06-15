@@ -98,8 +98,10 @@ RUN set -x \
 #  && dpkg -i ~/ffmpeg_${FFMPEG_VERSION}.deb
 
 # Purge & remove unnecessary dependencies ....
-RUN apt-get purge -y -f --auto-remove ca-certificates wget \
-    && apt-get autoremove
+RUN apt-get purge -y -f --auto-remove \
+#  ca-certificates \
+  wget \
+  && apt-get autoremove
 
 RUN rm -rf /var/lib/apt/lists/* \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8

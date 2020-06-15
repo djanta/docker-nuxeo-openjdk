@@ -66,12 +66,12 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
 
-#      - name: 'Checkout (docker-library/official-images)'
-#        uses: actions/checkout@v2
-#        with:
-#          token: ${{ secrets.GH_USER }}
-#          repository: docker-library/official-images
-#          path: ~/official-images
+      - name: 'Checkout (docker-library/official-images)'
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_USER }}
+          repository: docker-library/official-images
+          path: ~/official-images
 
       - name: GitHub credentials configuration - ${{ matrix.arch }}
         shell: bash
@@ -104,6 +104,8 @@ jobs:
             --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
+
+          ls -als ~/official-images/
 
  #         ~/official-images/test/run.sh $image_id
 
