@@ -66,16 +66,6 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --remote --merge --force --depth=3
 
-      - name: 'Checkout (docker-library/official-images)'
-        shell: bash
-        run: |
-          git clone https://github.com/docker-library/official-images.git ~/official-images
-#        uses: actions/checkout@v2
-#        with:
-#          token: ${{ secrets.GH_USER }}
-#          repository: docker-library/official-images
-#          path: ~/official-images
-
       - name: GitHub credentials configuration - ${{ matrix.arch }}
         shell: bash
         run: |
@@ -108,17 +98,28 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 
-          ls -als ~/official-images/
+      - name: 'Run Docker test (docker-library/official-images)'
+        shell: bash
+        env:
+          IMAGE: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+        run: |
+          git clone https://github.com/docker-library/official-images.git ~/official-images
+          ~/official-images/test/run.sh $IMAGE
 
- #         ~/official-images/test/run.sh $image_id
-
-      - name: Run Gitrivy Vulnerability check
-        uses: homoluctus/gitrivy@v2.0.0
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
-          trivy_version: true
-          issue_label: test,report,vulnerability
+
+#      - name: Run Gitrivy Vulnerability check
+#        uses: homoluctus/gitrivy@v2.0.0
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+#          trivy_version: true
+#          issue_label: test,report,vulnerability
 
 #      - name: Create Pull Request
 #        id: cpr
