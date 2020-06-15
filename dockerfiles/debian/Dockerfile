@@ -1,5 +1,7 @@
 # vim:set ft=dockerfile:
-FROM debian:stretch-slim
+FROM docker:10.4-slim
+
+#FROM debian:stretch-slim
 
 # Declaring expected external variable
 ARG BUILD_VERSION
