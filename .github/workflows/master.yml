@@ -98,7 +98,7 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
 
-      - name: 'Run Docker test (docker-library/official-images)'
+      - name: 'Run Docker test'
         shell: bash
         env:
           IMAGE: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
@@ -112,6 +112,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+          args: --severity-threshold=high
 
 #      - name: Run Gitrivy Vulnerability check
 #        uses: homoluctus/gitrivy@v2.0.0
