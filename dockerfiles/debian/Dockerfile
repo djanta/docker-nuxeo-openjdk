@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM docker:10.4-slim
+FROM debian:10.4-slim
 
 #FROM debian:stretch-slim
 
