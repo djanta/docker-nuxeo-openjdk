@@ -24,12 +24,14 @@ LABEL org.label-schema.description="DJANTA.IO Nuxeo SDK Base image share across 
 LABEL org.label-schema.vcs-url="https://github.com/djanta/docker-nuxeo-sdk"
 LABEL org.label-schema.vcs-ref=$BUILD_HASH
 
-ARG DEBIAN_FRONTEND
-ENV DEBIAN_FRONTEND noninteractive
+#ARG DEBIAN_FRONTEND
+#ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.12
 ENV FFMPEG_VERSION 4.2.2-3
+ENV JENV 0.5.3
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -99,6 +101,17 @@ RUN set -x \
 #  && dpkg -i ~/deb-multimedia-keyring.deb \
 #  && dpkg -i ~/ffmpeg_${FFMPEG_VERSION}.deb
 
+# Installing Jenv (Java multiversion management)
+#RUN wget -O ~/jenv.tar.gz https://github.com/jenv/jenv/archive/$JENV.tar.gz \
+#  && mkdir -p ~/.jenv \
+#  && tar -xf ~/jenv.tar.gz --directory ~/.jenv \
+#  && echo 'export PATH="~/.jenv/jenv-0.5.3/bin:$PATH"' >> ~/.bash_profile \
+#  && echo 'eval "$(jenv init -)"' >> ~/.bash_profile \
+#  && source ~/.bash_profile
+
+#RUN jenv enable-plugin export \
+#  && jenv versions
+
 # Purge & remove unnecessary dependencies ....
 RUN apt-get purge -y -f --auto-remove \
 #  ca-certificates \
@@ -108,7 +121,7 @@ RUN apt-get purge -y -f --auto-remove \
 RUN rm -rf /var/lib/apt/lists/* \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
-RUN dpkg -l
+#RUN dpkg -l
 
 # enabling utf-8 by default
 ENV LANG en_US.utf8
