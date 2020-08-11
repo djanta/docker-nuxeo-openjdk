@@ -1,13 +1,15 @@
 # vim:set ft=dockerfile:
-FROM debian:10.4-slim
+ARG BUILD_JDK_VERSION
+ARG BUILD_JDK_VARIANT
 
-#FROM debian:stretch-slim
+FROM openjdk:${BUILD_JDK_VERSION:-8}-${BUILD_JDK_VARIANT:-jdk}
 
 # Declaring expected external variable
 ARG BUILD_VERSION
 ARG RELEASE_VERSION
 ARG BUILD_DATE
 ARG BUILD_HASH
+ARG BUILD_OPEN_JDK
 
 LABEL description="DJANTA.IO Nuxeo SDK Base image share across all over any specific nuxeo version distribution"
 LABEL version="$BUILD_VERSION"
@@ -15,7 +17,7 @@ LABEL maintainer="DJANTA, LLC <team.docker@djanta.io>"
 LABEL author="Stanislas Koffi ASSOUTOVI"
 LABEL company="DJANTA, LLC"
 LABEL org.label-schema.schema-version="1.0"
-LABEL org.label-schema.name="djanta/nuxeo-sdk"
+LABEL org.label-schema.name="djanta/docker-nuxeo-sdk"
 LABEL org.label-schema.build-date=$BUILD_DATE
 LABEL org.label-schema.vendor="DJANTA, LLC"
 LABEL org.label-schema.url="https://djanta.io/"
@@ -24,38 +26,59 @@ LABEL org.label-schema.description="DJANTA.IO Nuxeo SDK Base image share across 
 LABEL org.label-schema.vcs-url="https://github.com/djanta/docker-nuxeo-sdk"
 LABEL org.label-schema.vcs-ref=$BUILD_HASH
 
-#ARG DEBIAN_FRONTEND
-#ENV DEBIAN_FRONTEND noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
 # grab gosu for easy step-down from root
-ENV GOSU_VERSION 1.12
-ENV FFMPEG_VERSION 4.2.2-3
-ENV JENV 0.5.3
+#ENV GOSU_VERSION 1.12
+#ENV FFMPEG_VERSION 4.2.2-3
+#ENV JENV 0.5.3
+
+ENV JDK_VERSION=${BUILD_OPEN_JDK:-11}
+ENV JDK_NAME=openjdk-${JDK_VERSION}-jdk
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-#=====================
+#====================================================================================
 # Updates for debconf
 # Prevent message 'debconf: unable to initialize frontend: Dialog'
 # Prevent message 'debconf: delaying package configuration, since apt-utils is not installed'
-#=====================
+#====================================================================================
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-# testing online: https://hadolint.github.io/hadolint/
+##
+# The run below intent to solve the follow error:
+# SOURCE (https://github.com/geerlingguy/ansible-role-java/issues/64):
+#Errors were encountered while processing:
+# openjdk-11-jre-headless:amd64
+# openjdk-11-jre:amd64
+# openjdk-11-jdk-headless:amd64
+# openjdk-11-jdk:amd64
+# ca-certificates-java
+#E: Sub-process /usr/bin/dpkg returned an error code (1)
+##
+RUN mkdir -p /usr/share/man/man1/
 
+# testing online: https://hadolint.github.io/hadolint/
 # hadolint ignore=SC2155,DL3008,DL3015
-RUN set -x \
-#	&& apt-get dist-upgrade -y \
-  && apt-get update \
+RUN \
+  #set -x && \
+	#apt-get dist-upgrade -y && \
+  apt-get update \
+#  && apt-cache search openjdk \
   && apt-get install -y --no-install-recommends \
   locales \
 	apt-utils \
 	apt-transport-https \
-	ca-certificates wget \
+	ca-certificates \
+	software-properties-common \
+#	${JDK_NAME} \
+	wget \
+	curl \
 	inotify-tools \
   net-tools \
 	gzip \
+	unzip \
+	zip \
 	gnupg2 \
 	dirmngr \
 	perl \
@@ -65,6 +88,7 @@ RUN set -x \
 	ffmpeg2theora \
 	ffmpeg \
 	ufraw \
+	ccextractor \
 	x264 \
 	libreoffice \
 	ghostscript \
@@ -88,38 +112,14 @@ RUN set -x \
 # Resolve resource: https://security.gentoo.org/glsa/202003-65
 # Debian version list: http://ftp.debian.org/debian/pool/main/f/ffmpeg/ or https://tracker.debian.org/pkg/ffmpeg
 ## END
-#RUN echo "deb http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list \
-#  && echo "deb-src http://www.deb-multimedia.org buster main non-free" >> /etc/apt/sources.list \
-#  && apt-get update -oAcquire::AllowInsecureRepositories=true \
-#  && apt-get install -y --no-install-recommends --allow-unauthenticated deb-multimedia-keyring \
-#  && apt-get update -y --no-install-recommends --allow-unauthenticated \
-#  && apt-get install -y --no-install-recommends ffmpeg \
-#  && ffmpeg -version
-
-#RUN wget -O ~/deb-multimedia-keyring.deb "http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb" \
-#  && wget -O ~/ffmpeg_${FFMPEG_VERSION}.deb "http://ftp.debian.org/debian/pool/main/f/ffmpeg/ffmpeg_${FFMPEG_VERSION}_$(dpkg --print-architecture | awk -F- '{ print $NF }').deb" \
-#  && dpkg -i ~/deb-multimedia-keyring.deb \
-#  && dpkg -i ~/ffmpeg_${FFMPEG_VERSION}.deb
-
-# Installing Jenv (Java multiversion management)
-#RUN wget -O ~/jenv.tar.gz https://github.com/jenv/jenv/archive/$JENV.tar.gz \
-#  && mkdir -p ~/.jenv \
-#  && tar -xf ~/jenv.tar.gz --directory ~/.jenv \
-#  && echo 'export PATH="~/.jenv/jenv-0.5.3/bin:$PATH"' >> ~/.bash_profile \
-#  && echo 'eval "$(jenv init -)"' >> ~/.bash_profile \
-#  && source ~/.bash_profile
-
-#RUN jenv enable-plugin export \
-#  && jenv versions
 
 # Purge & remove unnecessary dependencies ....
 RUN apt-get purge -y -f --auto-remove \
-#  ca-certificates \
+##  ca-certificates \
   wget \
-  && apt-get autoremove
-
-RUN rm -rf /var/lib/apt/lists/* \
-    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+  && apt-get autoremove \
+  && rm -rf /var/lib/apt/lists/* \
+  && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 #RUN dpkg -l
 
