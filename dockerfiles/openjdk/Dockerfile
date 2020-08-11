@@ -1,7 +1,9 @@
 # vim:set ft=dockerfile:
+
 ARG BUILD_JDK_VERSION
 ARG BUILD_JDK_VARIANT
 
+#ignore:DL1000
 FROM openjdk:${BUILD_JDK_VERSION:-8}-${BUILD_JDK_VARIANT:-jdk}
 
 # Declaring expected external variable

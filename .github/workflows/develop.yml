@@ -26,12 +26,12 @@ on:
     branches:
       - develop
 jobs:
-  openjdk:
+  validation:
     runs-on: 'ubuntu-latest'
     strategy:
       matrix:
-        arch: [ubuntu-latest]
-        version: [8, 11, 14, 15, 16]
+#        arch: [ubuntu-latest]
+#        version: [8, 11, 14, 15, 16]
         variant: [openjdk]
     steps:
 #      - name: Check Commit Type
