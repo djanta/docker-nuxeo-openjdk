@@ -14,25 +14,23 @@
 # limitations under the License.
 #
 
-name: Develop Branch
+name: Develop CI
 
 # On push event ...
 on:
   # Trigger the workflow on push or pull request, but only for the master branch
-  push:
-    branches:
-      - develop
-  pull_request:
-    branches:
-      - develop
+#  push:
+#    branches:
+#      - develop
+#  pull_request:
+#    branches:
+#      - develop
 jobs:
-  validation:
+  CI:
     runs-on: 'ubuntu-latest'
     strategy:
       matrix:
-#        arch: [ubuntu-latest]
-#        version: [8, 11, 14, 15, 16]
-        variant: [openjdk]
+        variant: [centos, debian, fedora, opensuse, oracle, oraclelinux7, ubuntu]
     steps:
 #      - name: Check Commit Type
 #        uses: gsactions/commit-message-checker@v1

@@ -16,20 +16,22 @@
 # more details.
 # ---------------------------------------------------------------------------
 
-DIST=${3:-openjdk}
-VERSION=${1:-8}
-VARIANT=${2:-jdk}
-CURRENT=$(date -u +'%y.%m')
-TAG="$CURRENT.$VERSION"
+DIST=${3:-debian}
+JDK_VERSION=${1:-8}
+JDK_VARIANT=${2:-jdk}
+VERSION_PREFIX=$(date -u +'%y.%m')
+VERSION_TAG="$VERSION_PREFIX.$JDK_VERSION"
+FULL_TAG="$DIST:$VERSION_TAG"
+BUILD_VERSION=$(date -u +'%y.%m.%d')-"$JDK_VERSION"
 
 #docker system prune -a -f
-# docker image inspect --format='' djanta/nuxeo-server-debian:8.10
+#docker image inspect --format='' djanta/nuxeo-server-debian:8.10
 
-docker --debug build -t djanta/nuxeo-sdk-$DIST:$TAG \
-  --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
+docker --debug build -t djanta/nuxeo-sdk-"$FULL_TAG" \
+  --build-arg RELEASE_VERSION="$VERSION_TAG" \
+  --build-arg BUILD_VERSION="$BUILD_VERSION" \
   --build-arg BUILD_HASH=$(git rev-parse HEAD) \
-  --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
   --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-  --build-arg BUILD_JDK_VERSION="$VERSION" \
-  --build-arg BUILD_JDK_VARIANT="$VARIANT" \
+  --build-arg BUILD_JDK_VERSION="$JDK_VERSION" \
+  --build-arg BUILD_JDK_VARIANT="$JDK_VARIANT" \
   --file $(pwd)/dockerfiles/$DIST/Dockerfile .

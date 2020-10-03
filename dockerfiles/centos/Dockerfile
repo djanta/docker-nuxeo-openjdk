@@ -1,89 +1,109 @@
 # vim:set ft=dockerfile:
-FROM centos:7
-MAINTAINER Nuxeo <packagers@nuxeo.com>
 
+ARG BUILD_DIST_VERSION
 
-#Add repositories need it for ffmpeg2theora and ffmpeg
-ARG NUX_DEXTOP_RPM_URL=http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm
+FROM centos:${BUILD_DIST_VERSION:-7}
+
+# Declaring expected external variable
+ARG BUILD_VERSION
+ARG RELEASE_VERSION
+ARG BUILD_DATE
+ARG BUILD_HASH
+ARG BUILD_JDK_VERSION
+ARG BUILD_JDK_VARIANT
+
+LABEL description="DJANTA.IO Nuxeo SDK image share across all our downstream nuxeo LTS customization"
+LABEL version="$RELEASE_VERSION"
+LABEL maintainer="DJANTA, LLC <cloud.packager@djanta.io>"
+LABEL author="Koffi Stanislas ASSOUTOVI"
+LABEL company="DJANTA, LLC"
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.name="djanta/docker-nuxeo-sdk"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.vendor="DJANTA, LLC"
+LABEL org.label-schema.url="https://djanta.io/"
+LABEL org.label-schema.version=$RELEASE_VERSION
+LABEL org.label-schema.description="DJANTA.IO Nuxeo SDK image share across all our downstream nuxeo LTS customization."
+LABEL org.label-schema.vcs-url="https://github.com/djanta/docker-nuxeo-sdk"
+LABEL org.label-schema.vcs-ref=$BUILD_HASH
+
+ENV JDK_VERSION=11
+#${BUILD_JDK_VERSION:-1.8.0}
+ENV JDK_NAME=${BUILD_JDK_VARIANT:-jdk}
+
+# Add repositories need it for ffmpeg2theora and ffmpeg
+#ARG NUX_DEXTOP_RPM_URL=http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm
+ARG NUX_DEXTOP_RPM_URL=http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
 ARG NUX_GPG_KEY_URL=http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
 
-# install java
-RUN yum install -y \
-  java-1.8.0-openjdk \
-  java-1.8.0-openjdk-devel \
-  wget
+##
+# https://centos.pkgs.org/
+##
+# Needed for dirmngr
+ARG TRINITY_REPO_URL=http://mirror.ppa.trinitydesktop.org/trinity/rpm/el7/trinity-r14/RPMS/noarch/trinity-repo-14.0.8-1.el7.noarch.rpm
+ARG DIRMNGR_URL=https://ftp.fau.de/trinity/trinity/rpm/el7/trinity-r14/RPMS/x86_64/dirmngr-1.1.1-5.el7.x86_64.rpm
+#ARG HANDBRAKE_URL=https://li.nux.ro/download/nux/dextop/el7/x86_64/HandBrake-cli-0.9.9-5.el7.nux.x86_64.rpm
 
+##
+# Registering and installing all third part gpgkeys and repos.
+##
 RUN yum -y install epel-release \
   && rpm --import ${NUX_GPG_KEY_URL} \
   && rpm -Uvh ${NUX_DEXTOP_RPM_URL}
 
+RUN \
+  echo "Java: openjdk-${JDK_VERSION}-${JDK_NAME}" \
+  echo "Devel: openjdk-${JDK_VERSION}-${JDK_NAME}-devel"
+
 # Add needed convert tools
-RUN yum -y upgrade
+RUN \
+  set -x \
+  && yum -y upgrade \
   && yum -y install \
-    perl \
-    ImageMagick \
-    ffmpeg \
-    ffmpeg2theora \
-    ufraw \
-    poppler-utils \
-    libreoffice \
-    libwpd-tools \
-    perl-Image-ExifTool \
-    ghostscript
+#  && yum -y remove jdk \
+  java-${JDK_VERSION}-${JDK_NAME} \
+  java-${JDK_VERSION}-${JDK_NAME}-devel \
+#  openjdk-${JDK_VERSION}-${JDK_NAME} \
+#  openjdk-${JDK_VERSION}-${JDK_NAME}-devel \
+  wget \
+  perl \
+  ImageMagick \
+  ffmpeg \
+  ffmpeg2theora \
+  ufraw \
+  ccextractor \
+  poppler-utils \
+  libreoffice \
+  libwpd-tools \
+  perl-Image-ExifTool \
+  ghostscript \
+  unzip \
+  zip \
+  dirmngr \
+  x264 \
+  handbrake-cli \
+  inotify-tools \
+  net-tools \
+  pwgen
 
+# /dev/urandom is used as random source, which is prefectly safe. CREDIT http://www.2uo.de/myths-about-urandom/
+RUN \
+  echo "securerandom.source=file:/dev/urandom" >> /usr/lib/jvm/jre/lib/security/java.security
 
-# Remove setuid/setgid binaries from images for security
-RUN find / -perm 6000 -type f -exec chmod a-s {} \; || true
+RUN \
+  echo "JAVA: $JAVA_HOME"
 
-ENV NUXEO_USER nuxeo
-ENV NUXEO_HOME /opt/nuxeo/server
-ENV HOME /opt/nuxeo/server
-ARG NUXEO_VERSION=10.10
-ARG NUXEO_DIST_URL=http://community.nuxeo.com/static/releases/nuxeo-10.10/nuxeo-server-10.10-tomcat.zip
-ARG NUXEO_MD5=90ef2ac005020e880b6277510800c30c
+RUN \
+  set -x \
+  && yum clean all
 
+RUN \
+  if [ -d /etc/alternatives ]; then \
+    ls -als /etc/alternatives/; \
+  fi
 
-# Create Nuxeo user
-RUN useradd -m -d /home/$NUXEO_USER -u 1000 -s /bin/bash $NUXEO_USER
+ENV JAVA_HOME /etc/alternatives/jre
 
-# Add distribution
-RUN curl -fsSL "${NUXEO_DIST_URL}" -o /tmp/nuxeo-distribution-tomcat.zip \
-    && if [ $NUXEO_VERSION != "master" ]; then echo "$NUXEO_MD5 /tmp/nuxeo-distribution-tomcat.zip" | md5sum -c -; fi \
-    && mkdir -p /tmp/nuxeo-distribution $(dirname $NUXEO_HOME) \
-    && unzip -q -d /tmp/nuxeo-distribution /tmp/nuxeo-distribution-tomcat.zip \
-    && DISTDIR=$(/bin/ls /tmp/nuxeo-distribution | head -n 1) \
-    && mv /tmp/nuxeo-distribution/$DISTDIR $NUXEO_HOME \
-    && sed -i -e "s/^org.nuxeo.distribution.package.*/org.nuxeo.distribution.package=docker/" $NUXEO_HOME/templates/common/config/distribution.properties \
-    && rm -rf /tmp/nuxeo-distribution* \
-    && chmod +x $NUXEO_HOME/bin/*ctl $NUXEO_HOME/bin/*.sh \
-    # For arbitrary user in the admin group
-    && chmod g+rwX $NUXEO_HOME/bin/*ctl $NUXEO_HOME/bin/*.sh \
-    && $NUXEO_HOME/bin/nuxeoctl mp-init \
-    && chown -R 1000:0 $NUXEO_HOME && chmod -R g+rwX $NUXEO_HOME
+WORKDIR /
 
-COPY docker-template $NUXEO_HOME/templates/docker
-COPY nuxeo.conf /etc/nuxeo/nuxeo.conf.template
-ENV NUXEO_CONF /etc/nuxeo/nuxeo.conf
-
-# Protecting writeable directories to support arbitrary User IDs for OpenShift
-# https://docs.openshift.com/container-platform/3.4/creating_images/guidelines.html
-RUN chown -R 1000:0 /etc/nuxeo && chmod g+rwX /etc/nuxeo && rm -f $NUXEO_HOME/bin/nuxeo.conf \
-    && mkdir -p /var/lib/nuxeo/data \
-    && chown -R 1000:0 /var/lib/nuxeo/data && chmod -R g+rwX /var/lib/nuxeo/data \
-    && mkdir -p /var/log/nuxeo \
-    && chown -R 1000:0 /var/log/nuxeo && chmod -R g+rwX /var/log/nuxeo \
-    && mkdir -p /var/run/nuxeo \
-    && chown -R 1000:0 /var/run/nuxeo && chmod -R g+rwX /var/run/nuxeo \
-    && mkdir -p /docker-entrypoint-initnuxeo.d \
-    && chown -R 1000:0 /docker-entrypoint-initnuxeo.d && chmod -R g+rwX /docker-entrypoint-initnuxeo.d  \
-    && chmod g=u /etc/passwd
-
-ENV PATH $NUXEO_HOME/bin:$PATH
-
-WORKDIR $NUXEO_HOME
-COPY docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
-EXPOSE 8080
-CMD ["nuxeoctl","console"]
-
-USER 1000
+# vim:set et ts=2 sw=2:

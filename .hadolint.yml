@@ -1,3 +1,10 @@
+# Hadolint configuration file
+
 ignored:
   - SC2102
   - DL1000
+  - DL3006
+
+trustedRegistries:
+  - docker.io
+  - docker.pkg.github.com

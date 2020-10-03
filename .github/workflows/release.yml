@@ -144,8 +144,8 @@ jobs:
 #          version-level: '-M'
 
       - name: Create or Update version ID
-        #        # if repvious increment-semver-major step failed
-        #        if: ${{ failure() }}
+#        # if repvious increment-semver-major step failed
+#        if: ${{ failure() }}
         id: version
         run: |
           echo "GITHUB_REF is a tag you set for the release"

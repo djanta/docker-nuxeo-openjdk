@@ -1,4 +1,8 @@
 # vim:set ft=dockerfile:
+
+ARG BUILD_JDK_VERSION
+ARG BUILD_JDK_VARIANT
+
 FROM registry.access.redhat.com/rhel7
 
 # Declaring expected external variable
@@ -6,11 +10,13 @@ ARG BUILD_VERSION
 ARG RELEASE_VERSION
 ARG BUILD_DATE
 ARG BUILD_HASH
+ARG BUILD_JDK_VERSION
+ARG BUILD_JDK_VARIANT
 
 LABEL description="DJANTA.IO Nuxeo SDK Base image share across all over any specific nuxeo version distribution"
 LABEL version="$BUILD_VERSION"
-LABEL maintainer="DJANTA, LLC <team.docker@djanta.io>"
-LABEL author="Stanislas Koffi ASSOUTOVI"
+LABEL maintainer="DJANTA, LLC <cloud.packager@djanta.io>"
+LABEL author="Koffi Stanislas ASSOUTOVI"
 LABEL company="DJANTA, LLC"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.name="djanta/nuxeo-sdk"
@@ -24,29 +30,18 @@ LABEL org.label-schema.vcs-ref=$BUILD_HASH
 
 LABEL io.k8s.description="Starts a Nuxeo Platform server."
 LABEL io.k8s.display-name="Nuxeo"
-LABEL io.openshift.tags="nuxeo"
+LABEL io.openshift.tags="nuxeo nuxeo-sdk djanta-nuxeo-sdk"
 LABEL io.openshift.min-memory="2Gi"
 LABEL io.openshift.min-cpu="2"
-
-LABEL name="nuxeo/nuxeo" \
-      vendor="Nuxeo" \
-      version="%%NUXEO_VERSION%%" \
-      release="1" \
-      summary="Nuxeo Digital Asset Platform" \
-      description="The Nuxeo platform image packaged as a container" \
-      url="https://www.nuxeo.com" \
-      run='docker run -tdi -p 8080:8080 --name ${NAME} ${IMAGE}' \
-      io.k8s.description="Starts a Nuxeo Platform server." \
-      io.k8s.display-name="Nuxeo" \
-      io.openshift.expose-services="8080/http" \
-      io.openshift.tags="nuxeo" \
-      io.openshift.min-memory="2Gi" \
-      io.openshift.min-cpu="2"
+LABEL io.openshift.min-cpu="2"
+LABEL url="https://djanta.io/"
+LABEL summary="DJANTA.IO Nuxeo SDK Base image share across all over any specific nuxeo version distribution"
+LABEL release="$RELEASE_VERSION"
 
 # install java
-RUN yum-config-manager --disable rhel-7-server-htb-rpms \
-  && yum install -y \
-  wget unzip
+#RUN yum-config-manager --disable rhel-7-server-htb-rpms \
+#  && yum install -y \
+#  wget unzip
 
 #Add repositories need it for ffmpeg2theora and ffmpeg
 # ARG EPEL_RPM_URL=https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -81,12 +76,6 @@ RUN yum -y upgrade \
 
 ADD licenses /licenses
 ADD help.1 /help.1
-
-# Remove setuid/setgid binaries from images for security
-RUN find / -perm 6000 -type f -exec chmod a-s {} \; || true
-
-# Create Nuxeo user
-RUN useradd -m -d /home/$NUXEO_USER -u 1000 -s /bin/bash $NUXEO_USER
 
 RUN yum list installed
 
