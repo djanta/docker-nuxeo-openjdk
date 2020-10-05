@@ -17,10 +17,10 @@
 name: Vulnerability Scan
 
 on:
-  schedule:
-    #DOC: https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
-    #Run everyday at 23:00 of every week
-    - cron: '0 23 * * 6'
+#  schedule:
+#    #DOC: https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
+#    #Run everyday at 23:00 of every week
+#    - cron: '0 23 * * 6'
 
 jobs:
   scan:

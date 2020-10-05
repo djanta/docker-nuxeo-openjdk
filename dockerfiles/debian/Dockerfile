@@ -33,6 +33,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV JDK_VERSION=${BUILD_JDK_VERSION:-8}
 ENV JDK_NAME=openjdk-${JDK_VERSION}-${BUILD_JDK_VARIANT:-jdk}
 
+ENV IMAGE_MAGICK_MAX_TREAD=1
+
 # grab gosu for easy step-down from root
 #ENV GOSU_VERSION 1.12
 #ENV FFMPEG_VERSION 4.2.2-3
@@ -110,10 +112,25 @@ RUN \
 	poppler-utils \
 	libwpd-tools \
 	inotify-tools \
-  # Installing s3fs to map s3 bucket locally as an FS -> (https://github.com/s3fs-fuse/s3fs-fuse)
-	s3fs \
-	htop \
-	gtop 
+# Installing s3fs to map s3 bucket locally as an FS -> (https://github.com/s3fs-fuse/s3fs-fuse)
+#	s3fs \
+	htop
+#	gtop
+
+# Install and install ccextractor
+RUN \
+  wget -O ccextractor-master.zip https://codeload.github.com/CCExtractor/ccextractor/zip/master \
+  && unzip ccextractor-master.zip \
+  && cd ccextractor-master/linux \
+  && ./build
+
+#DATE=$(date +'%Y%m%d')
+RUN checkinstall --pkgname=ccextractor-djanta --pkgversion="0.0.1-$(date +'%Y%m%d')-01" \
+    --maintainer="'DJANTA, LLC <cloud.packager@djanta.io>'" \
+    --requires="libtesseract4,libcurl4" \
+    --backup=no --deldoc=yes --deldesc=yes --fstrans=no --default \
+    && cp ccextractor /usr/local/bin
+
 
 #	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 #	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
