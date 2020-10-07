@@ -47,10 +47,10 @@ jobs:
 #          pattern: '^.+(Resolves|Fixes): \#[0-9]+$'
 #          error: 'You need at least one "Resolves|Fixes: #<issue number>" line.'
 
-#      - name : GITHUB CONTEXT
-#        env:
-#          GITHUB_CONTEXT: ${{ toJson(github) }}
-#        run: echo "$GITHUB_CONTEXT"
+      - name : GITHUB CONTEXT
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
 #      - name: get commit message
 #        run: |
