@@ -22,6 +22,10 @@ on:
 #    #Run everyday at 23:00 of every week
 #    - cron: '0 23 1 JAN,MAY,SEP *'
 
+  push:
+    branches:
+      - devxxxxxxelop
+
 jobs:
   scan:
     name: Daily Vulnerability Scan

@@ -112,49 +112,37 @@ RUN \
 	poppler-utils \
 	libwpd-tools \
 	inotify-tools \
-# Installing s3fs to map s3 bucket locally as an FS -> (https://github.com/s3fs-fuse/s3fs-fuse)
-#	s3fs \
 	htop
-#	gtop
+
+# Installing (ccextractor) required components
+RUN \
+  set -x \
+  && apt-get install -y \
+  libglew-dev \
+  libglfw3-dev \
+  cmake \
+  gcc \
+  libcurl4-gnutls-dev \
+  tesseract-ocr \
+  libtesseract-dev \
+  libleptonica-dev
 
 # Install and install ccextractor
 RUN \
   wget -O ccextractor-master.zip https://codeload.github.com/CCExtractor/ccextractor/zip/master \
   && unzip ccextractor-master.zip \
+  && ls -als ccextractor-master/ \
   && cd ccextractor-master/linux \
   && ./build
-
-#DATE=$(date +'%Y%m%d')
-RUN checkinstall --pkgname=ccextractor-djanta --pkgversion="0.0.1-$(date +'%Y%m%d')-01" \
-    --maintainer="'DJANTA, LLC <cloud.packager@djanta.io>'" \
-    --requires="libtesseract4,libcurl4" \
-    --backup=no --deldoc=yes --deldesc=yes --fstrans=no --default \
-    && cp ccextractor /usr/local/bin
-
-
-#	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-#	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
-#	&& export GNUPGHOME="$(mktemp -d)" \
-#	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-#	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-#	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-#	&& chmod +x /usr/local/bin/gosu \
-#	&& gosu nobody true
-
-## Start: ffmpeg vulnerability fixing: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-17542
-# Version affected: <= 4.1
-# Version Fix: >= 4.2.0
-# Fix: https://www.deb-multimedia.org/
-# Resolve resource: https://security.gentoo.org/glsa/202003-65
-# Debian version list: http://ftp.debian.org/debian/pool/main/f/ffmpeg/ or https://tracker.debian.org/pkg/ffmpeg
-## END
 
 # Purge & remove unnecessary dependencies ....
 RUN apt-get purge -y -f --auto-remove \
   && apt-get autoremove \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
-  && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+  && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
+  && rm ccextractor-master.zip \
+  && rm -rf ccextractor-master
 
 #RUN dpkg -l
 
