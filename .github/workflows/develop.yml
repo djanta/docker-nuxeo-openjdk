@@ -23,7 +23,7 @@ on:
     branches:
       - develop
 jobs:
-  CI:
+  lint:
     runs-on: ['ubuntu-latest']
     strategy:
       matrix:
@@ -83,8 +83,18 @@ jobs:
           HADOLINT_ACTION_DOCKERFILE_FOLDER: $(pwd)/dockerfiles/${{ matrix.variant }}
           HADOLINT_ACTION_COMMENT: false
 
+#      - name: Create or Update Project Card
+#        uses: peter-evans/create-or-update-project-card@v1
+#        if: ${{ success() }}
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          project-name: Cloud
+#          column-name: To do
+#          issue-number: ${{ steps.cpr.outputs.pull-request-number }}
+
       - name: Create Pull Request
         id: cpr
+        if: ${{ failure() }}
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GH_TOKEN }}
@@ -107,11 +117,3 @@ jobs:
           draft: false
           request-to-parent: false
           branch-suffix: short-commit-hash
-
-#      - name: Create or Update Project Card
-#        uses: peter-evans/create-or-update-project-card@v1
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          project-name: Cloud
-#          column-name: To do
-#          issue-number: ${{ steps.cpr.outputs.pull-request-number }}
