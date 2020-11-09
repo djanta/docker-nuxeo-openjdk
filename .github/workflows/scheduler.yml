@@ -14,22 +14,18 @@
 # limitations under the License.
 #
 
-name: Periodic Tag
+name: Scheduled
 
 on:
-#  schedule:
-#    #DOC: https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
-#    #Run everyday at 23:00 of every week
-#    - cron: '0 23 1 JAN,MAY,SEP *'
-
-  push:
-    branches:
-      - devxxxxxxelop
+  schedule:
+    #DOC: https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
+    #Run everyday at 23:00 of every week
+    - cron: '0 23 1 JAN,MAY,SEP *'
 
 jobs:
-  scan:
-    name: Daily Vulnerability Scan
-    runs-on: ubuntu-latest
+  release:
+    name: Automatic Release
+    runs-on: [ubuntu-latest]
     strategy:
       matrix:
         arch: [debian, ubuntu]
@@ -40,8 +36,27 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
           submodules: true
-      - name: Pull docker image
-        run: docker pull djanta/nuxeo-sdk-${{ matrix.arch }}:${{ matrix.version }}
+
+#      - name: Pull docker image
+#        run: docker pull djanta/nuxeo-sdk-${{ matrix.arch }}:${{ matrix.version }}
+
+      - name: Create or Update version ID
+#        if: ${{ failure() }}
+        if: github.event_name == 'release' && github.event.action == 'created'
+        id: version
+        run: |
+          echo "GITHUB_REF is a tag you set for the release"
+          echo "Your GitHub ref: ${GITHUB_REF}"
+          VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
+
+          echo "Preparing version: ${VERSION}"
+          echo "__version__ = \"${VERSION}\"" > __version__.py
+          echo "##[set-output name=version;]$(echo ${VERSION})"
+
+          echo ::set-env name=version::${VERSION})
+          if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=version::$(date -u +'%y.%m')
+          fi
 
       - name: Run Gitrivy Vulnerability check
         uses: homoluctus/gitrivy@v1.0.0

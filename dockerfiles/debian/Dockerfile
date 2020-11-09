@@ -1,4 +1,4 @@
-# vim:set ft=dockerfile:
+#vim:set ft=dockerfile:
 
 ARG BUILD_JDK_VERSION
 ARG BUILD_JDK_VARIANT
@@ -104,7 +104,7 @@ RUN \
 	ffmpeg2theora \
 	ffmpeg \
 	ufraw \
-	ccextractor \
+#	ccextractor \
 	x264 \
 	libreoffice \
 	ghostscript \
@@ -124,7 +124,8 @@ RUN \
   gcc \
   libcurl4-gnutls-dev \
   tesseract-ocr \
-  libtesseract-dev \
+## For Unbunu only ##
+#  libtesseract-dev \
   libleptonica-dev
 
 # Install and install ccextractor

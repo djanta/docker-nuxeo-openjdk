@@ -20,22 +20,47 @@ all () {
   echo "Build all ... "
 }
 
-DIST=${3:-debian}
-JDK_VERSION=${1:-8}
+#DIST=${3:-debian}
+#JDK_VERSION=${1:-8}
 JDK_VARIANT=${2:-jdk}
 VERSION_SUFFIX=$(date -u +'%y.%m')
-VERSION_TAG="$JDK_VERSION.$VERSION_SUFFIX"
-FULL_TAG="$VERSION_TAG-$DIST"
-BUILD_VERSION=$(date -u +'%y.%m.%d')-"$JDK_VERSION"
+#VERSION_TAG="$JDK_VERSION.$VERSION_SUFFIX"
+#FULL_TAG="$VERSION_TAG-$DIST"
+#BUILD_VERSION=$(date -u +'%y.%m.%d')-"$JDK_VERSION"
 
 #docker system prune -a -f
 #docker image inspect --format='' djanta/nuxeo-sdk:8.10-debian
 
-docker --debug build -t djanta/nuxeo-sdk:"$FULL_TAG" \
-  --build-arg RELEASE_VERSION="$VERSION_TAG" \
-  --build-arg BUILD_VERSION="$BUILD_VERSION" \
-  --build-arg BUILD_HASH=$(git rev-parse HEAD) \
-  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-  --build-arg BUILD_JDK_VERSION="$JDK_VERSION" \
-  --build-arg BUILD_JDK_VARIANT="$JDK_VARIANT" \
-  --file $(pwd)/dockerfiles/$DIST/Dockerfile .
+# shellcheck disable=SC2206
+distributions=(${1:-debian ubuntu centos fedora opensuse oracle oraclelinux7 oraclelinux8 rhel})
+
+# shellcheck disable=SC2206
+jdkversions=(${2:-8 9 11 12 13 14 15 16})
+
+for jdkver in "${jdkversions[@]}";
+do
+  VERSION_TAG="$jdkver.$VERSION_SUFFIX"
+  BUILD_VERSION=$(date -u +'%y.%m.%d')-"$jdkver"
+
+  for dist in "${distributions[@]}";
+    do
+    FULL_TAG="$VERSION_TAG-$dist"
+    docker --debug build -t djanta/nuxeo-sdk:"$FULL_TAG" \
+      --build-arg RELEASE_VERSION="$VERSION_TAG" \
+      --build-arg BUILD_VERSION="$BUILD_VERSION" \
+      --build-arg BUILD_HASH=$(git rev-parse HEAD) \
+      --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+      --build-arg BUILD_JDK_VERSION="$jdkver" \
+      --build-arg BUILD_JDK_VARIANT="$JDK_VARIANT" \
+      --file $(pwd)/dockerfiles/$dist/Dockerfile .
+  done
+done
+
+#docker --debug build -t djanta/nuxeo-sdk:"$FULL_TAG" \
+#  --build-arg RELEASE_VERSION="$VERSION_TAG" \
+#  --build-arg BUILD_VERSION="$BUILD_VERSION" \
+#  --build-arg BUILD_HASH=$(git rev-parse HEAD) \
+#  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+#  --build-arg BUILD_JDK_VERSION="$JDK_VERSION" \
+#  --build-arg BUILD_JDK_VARIANT="$JDK_VARIANT" \
+#  --file $(pwd)/dockerfiles/$DIST/Dockerfile .

@@ -27,9 +27,9 @@ LABEL org.label-schema.description="DJANTA.IO Nuxeo SDK image share across all o
 LABEL org.label-schema.vcs-url="https://github.com/djanta/docker-nuxeo-sdk"
 LABEL org.label-schema.vcs-ref=$BUILD_HASH
 
-ENV JDK_VERSION=11
-#${BUILD_JDK_VERSION:-1.8.0}
-ENV JDK_NAME=${BUILD_JDK_VARIANT:-jdk}
+ENV JDK_VERSION=${BUILD_JDK_VERSION:-11}
+ENV JDK_NAME="openjdk"
+#${BUILD_JDK_VARIANT:-openjdk}
 
 # Add repositories need it for ffmpeg2theora and ffmpeg
 #ARG NUX_DEXTOP_RPM_URL=http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm
@@ -51,10 +51,6 @@ RUN yum -y install epel-release \
   && rpm --import ${NUX_GPG_KEY_URL} \
   && rpm -Uvh ${NUX_DEXTOP_RPM_URL}
 
-RUN \
-  echo "Java: openjdk-${JDK_VERSION}-${JDK_NAME}" \
-  echo "Devel: openjdk-${JDK_VERSION}-${JDK_NAME}-devel"
-
 # Add needed convert tools
 RUN \
   set -x \
@@ -63,35 +59,55 @@ RUN \
 #  && yum -y remove jdk \
   java-${JDK_VERSION}-${JDK_NAME} \
   java-${JDK_VERSION}-${JDK_NAME}-devel \
-#  openjdk-${JDK_VERSION}-${JDK_NAME} \
-#  openjdk-${JDK_VERSION}-${JDK_NAME}-devel \
   wget \
+	curl \
+  net-tools \
+	gzip \
+	unzip \
+	zip \
+	gnupg2 \
+	dirmngr \
   perl \
   ImageMagick \
   ffmpeg \
   ffmpeg2theora \
   ufraw \
-  ccextractor \
+#  ccextractor \
   poppler-utils \
   libreoffice \
   libwpd-tools \
   perl-Image-ExifTool \
   ghostscript \
-  unzip \
-  zip \
-  dirmngr \
   x264 \
   handbrake-cli \
   inotify-tools \
-  net-tools \
-  pwgen
+  pwgen \
+  htop
+
+# Installing (ccextractor) required components
+RUN \
+  set -x \
+  && yum install -y \
+  libglew-dev \
+  libglfw3-dev \
+  cmake \
+  gcc \
+  libcurl4-gnutls-dev \
+  tesseract-ocr \
+#  libtesseract-dev \
+  libleptonica-dev
+
+# Install and install ccextractor
+RUN \
+  wget -O ccextractor-master.zip https://codeload.github.com/CCExtractor/ccextractor/zip/master \
+  && unzip ccextractor-master.zip \
+  && ls -als ccextractor-master/ \
+  && cd ccextractor-master/linux \
+  && ./build
 
 # /dev/urandom is used as random source, which is prefectly safe. CREDIT http://www.2uo.de/myths-about-urandom/
 RUN \
   echo "securerandom.source=file:/dev/urandom" >> /usr/lib/jvm/jre/lib/security/java.security
-
-RUN \
-  echo "JAVA: $JAVA_HOME"
 
 RUN \
   set -x \
@@ -101,6 +117,19 @@ RUN \
   if [ -d /etc/alternatives ]; then \
     ls -als /etc/alternatives/; \
   fi
+
+RUN \
+  yum list installed
+
+RUN \
+  echo "JAVA: $JAVA_HOME"
+
+RUN \
+  java -version
+
+#
+#RUN \
+#  alternatives --config java
 
 ENV JAVA_HOME /etc/alternatives/jre
 

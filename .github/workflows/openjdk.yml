@@ -1,0 +1,154 @@
+#
+# Copyright 2019-2020 DJANTA, LLC (https://www.djanta.io)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed toMap in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: OpenJDK
+
+# On push event ...
+on:
+#  # Trigger the workflow on push or pull request, but only for the master branch
+#  push:
+#    branches:
+#      - develop
+
+  release:
+    types: [created]
+  # Ensure GitHub actions are not run twice for same commits
+  push:
+    branches: [master]
+    tags: ['*']
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: ['ubuntu-latest']
+    steps:
+      - name: Checking out
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          submodules: true
+      - name: Submodules Sync
+        shell: bash
+        run: |
+          git submodule update --init --recursive --remote --merge --force
+      - name: GitHub credentials configuration - ${{ matrix.os }}
+        shell: bash
+        run: |
+          git config user.name "${{ secrets.GH_USER }}"
+          git config user.email "${{ secrets.GH_USER_EMAIL }}"
+          git config credential.helper "store --file=.git/credentials"
+          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials
+
+      - name: Pull docker slimify
+        env:
+          IMAGE: dslim/docker-slim:latest
+        run: |
+          docker pull "$IMAGE"
+
+      - name: Clone Docker Test
+          shell: bash
+          run: |
+            git clone https://github.com/docker-library/official-images.git ~/official-images
+
+      - name: Build Image & Deploy
+        fail-fast: true
+        env:
+          GITHUB_USERNAME: ${{ secrets.GH_USER }}
+          GH_USER: ${{ secrets.GH_USER }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          PROJECT_ID: nuxeo-sdk
+          ACCOUNT_ID: djanta
+          IMAGE_BASE: $ACCOUNT_ID/$PROJECT_ID
+          IMAGE_TAG: $IMAGE_BASE:$VERSION
+          GITHUB_IMAGE_TAG: $PROJECT_ID:$VERSION
+          GITHUB_IMAGE_BRANCH: $GITHUB_IMAGE_TAG-$TRAVIS_BRANCH
+          GITHUB_REGISTRY: docker.pkg.github.com
+          GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
+          JDK_VERSION: "8 9 11 12 13 14 15 16"
+          VARIANT: "debian oracle oraclelinux7 oraclelinux8"
+          REGISTRIES: "hub.docker.com docker.pkg.github.com"
+        run: |
+          IMAGE=$ACCOUNT_ID/$PROJECT_ID-${{ matrix.arch }}:develop
+          docker --debug build -t $IMAGE \
+            --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
+            --build-arg BUILD_HASH=$(git rev-parse HEAD) \
+            --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
+            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
+
+          ~/official-images/test/run.sh $IMAGE
+
+#      - name: 'Run Docker test'
+#        shell: bash
+#        env:
+#          IMAGE: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+#        run: |
+#          git clone https://github.com/docker-library/official-images.git ~/official-images
+#          ~/official-images/test/run.sh $IMAGE
+
+      - name: Snyk vulnerabilities check
+        uses: snyk/actions/docker@master
+        fail-fast: false
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+          args: --severity-threshold=high --file=dockerfiles/${{ matrix.arch }}/.vulnerability
+
+      - name: Hadolint lint
+        id: lint
+        uses: burdzwastaken/hadolint-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HADOLINT_ACTION_DOCKERFILE_FOLDER: $(pwd)/dockerfiles/${{ matrix.variant }}
+          HADOLINT_ACTION_COMMENT: false
+
+#      - name: Create or Update Project Card
+#        uses: peter-evans/create-or-update-project-card@v1
+#        if: ${{ success() }}
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          project-name: Cloud
+#          column-name: To do
+#          issue-number: ${{ steps.cpr.outputs.pull-request-number }}
+
+      - name: Create Pull Request
+        id: cpr
+        if: ${{ failure() }}
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          commit-message: "[WIP] - PR on ${GITHUB_REF} after passing lint on (dockerfiles/${{ matrix.variant }})"
+          committer: ${{ github.event.pusher.name }} <${{ github.event.pusher.email }}>
+          author: ${{ github.event.pusher.name }} <${{ github.event.pusher.email }}>
+          title: '[PR: #${{ github.run_number }}] from ${{ github.ref }} by (${{ github.event.head_commit.committer.name }})'
+          body: |
+            - ${{ github.event.head_commit.message }}
+            - Auto-generated by [create-pull-request][1]
+            - PR by (${{ github.event.head_commit.committer.name }}) on ${GITHUB_REF} after passing lint on (dockerfiles/${{ matrix.variant }})
+
+            [1]: https://github.com/$GITHUB_REPOSITORY/pull
+          labels: report, automated pr
+          assignees: stanislaska
+          reviewers: stanislaska
+          team-reviewers: owners, maintainers
+#          milestone: 1
+          branch: patch
+          draft: false
+#          request-to-parent: false
+          branch-suffix: short-commit-hash
