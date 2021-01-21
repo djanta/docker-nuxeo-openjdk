@@ -103,17 +103,7 @@ jobs:
           DISTRIBUTION: "debian ubuntu"
           REGISTRIES: "hub.docker.com docker.pkg.github.com"
         run: |
-           VERSION_SUFFIX=$(date -u +'%y.%m')
-#          IMAGE=$ACCOUNT_ID/$PROJECT_ID:${{ matrix.arch }}-develop
-#          docker --debug build -t $IMAGE \
-#            --build-arg BUILD_VERSION=$(date -u +'%y.%m') \
-#            --build-arg BUILD_HASH=$(git rev-parse HEAD) \
-#            --build-arg RELEASE_VERSION=$(date -u +'%y.%m') \
-#            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-#            --file $(pwd)/dockerfiles/${{ matrix.arch }}/Dockerfile .
-#
-#          ~/official-images/test/run.sh $IMAGE
-
+          VERSION_SUFFIX=$(date -u +'%y.%m')
           for jdkver in "${JDK_VERSION[@]}"; do \
             VERSION_TAG="$jdkver.$VERSION_SUFFIX"; \
             BUILD_VERSION=$(date -u +'%y.%m.%d')-"$jdkver"; \
