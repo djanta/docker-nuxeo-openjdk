@@ -122,10 +122,10 @@ jobs:
                 --build-arg BUILD_JDK_VERSION="$jdkver" \
                 --build-arg BUILD_JDK_VARIANT="$JDK_VARIANT" \
                 --file $(pwd)/dockerfiles/$dist/Dockerfile .; \
-
-               ~/official-images/test/run.sh djanta/nuxeo-sdk:"$FULL_TAG"; \
             done; \
           done
+
+#          ~/official-images/test/run.sh djanta/nuxeo-sdk:"$FULL_TAG"; \
 
           docker images
 
