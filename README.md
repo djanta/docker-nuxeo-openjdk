@@ -1,9 +1,8 @@
-# Nuxeo Docker Essentials
+# Nuxeo SDK Essentials
 
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/djanta/docker-nuxeo-sdk)](https://github.com/djanta/docker-nuxeo-sdk)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/djanta/docker-nuxeo-sdk?color=brightgreen&include_prereleases)](https://github.com/djanta/docker-nuxeo-sdk)
 [![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/djanta/nuxeo-sdk)](https://github.com/djanta/docker-nuxeo-sdk)
-
 [![stars badge](https://img.shields.io/docker/stars/djanta/nuxeo-sdk.svg)](https://github.com/djanta/docker-nuxeo-sdk)
 [![pull badge](https://img.shields.io/docker/pulls/djanta/nuxeo-sdk.svg)](https://github.com/djanta/docker-nuxeo-sdk)
 [![Docker image](https://images.microbadger.com/badges/image/djanta/nuxeo-sdk.svg)](https://microbadger.com/images/djanta/docker-nuxeo-sdk)
@@ -47,87 +46,115 @@ Remote Targets
 
 | Platform                     | Versions                                         | Architectures |
 | ---------------------------- | ------------------------------------------------ | ------------- |
-| AIX                          | 6.1, 7.1, 7.2                                    | ppc64         |
-| CentOS                       | 5, 6, 7                                          | i386, x86_64  |
-| Debian                       | 7, 8, 9                                          | i386, x86_64  |
-| FreeBSD                      | 9, 10, 11                                        | i386, amd64   |
-| Mac OS X                     | 10.9, 10.10, 10.11, 10.12, 10.13, 10.14          | x86_64        |
-| Oracle Enterprise Linux      | 5, 6, 7                                          | i386, x86_64  |
+| Debian                       | buster                                           | i386, x86_64  |
+| Ubuntu                       | groovy                                           | x86, x86_64   |
+| CentOS                       | 7                                                | i386, x86_64  |
+| Oracle Enterprise Linux      | 7, 8                                             | i386, x86_64  |
 | Red Hat Enterprise Linux     | 5, 6, 7                                          | i386, x86_64  |
-| Solaris                      | 10, 11                                           | sparc, x86    |
-| Ubuntu Linux                 |                                                  | x86, x86_64   |
 | SUSE Linux Enterprise Server | 11, 12                                           | x86_64        |
-| Scientific Linux             | 5.x, 6.x and 7.x                                 | i386, x86_64  |
 | Fedora                       |                                                  | x86_64        |
 | OpenSUSE                     | 13, 42                                           | x86_64        |
-| OmniOS                       |                                                  | x86_64        |
-| Gentoo Linux                 |                                                  | x86_64        |
 | Arch Linux                   |                                                  | x86_64        |
-| HP-UX                        | 11.31                                            | ia64          |
-
-\**For Windows, PowerShell 5.0 or above is required.*
 
 In addition, runtime support is provided for:
 
 | Platform | Versions | Arch   |
 | -------- | -------- | ------ |
 | Debian   | 8, 9     | x86_64 |
-| RHEL     | 6, 7     | x86_64 |
 | Ubuntu   | 12.04+   | x86_64 |
+| RHEL     | 6, 7     | x86_64 |
 
 ## Supported JDK
 
-| | Debian   |      Centos     |  rhel |
-|:----------:|:----------:|:-------------:|:---------:|
-|8| √ |  √ | √ |
-|11| √ |  √ | √ |
-|14| √ |  √ | √ |
-|15| √ |  √ | √ |
-|16| √ |  √ | √ |
-
-
-## Where from?
-As we're making all our containers to be largely available and easier to use, we'll be distribuating this images through the following registries:
-
-|                           |                           |                       |
-| ------------------------- | ------------------------- | --------------------- |
-| **Docker Registry**       | hub.docker.io             | √                     |
-| **Github Registry**       | docker.pkg.github.com     | √                     |
-| **Openshift Registry**    |                           | X                     |
-| **Amazon Registry**       |                           | X                     |
+| | Debian   |      Ubuntu     |      Centos     |      Fedora     |      Opensuse     |  rhel |  OracleLinux7 |
+|:----------:|:----------:|:----------:|:-------------:|:-------------:|:-------------:|:---------:|:---------:|
+|8| √ |  √ | √ | X | X | X | X |
+|9| - |  - | - | - | - | - | - |
+|11| √ |  √ | √ | X | X | X | X |
+|14| √ |  √ | √ | X | X | X | X |
+|15| √ |  √ | √ | X | X | X | X |
+|16| √ |  √ | √ | X | X | X | X |
 
 ## Installed Software
 
-| | Debian   |      Centos     |  rhel |
-|----------:|:----------:|:-------------:|:---------:|
+| | Debian   |      Ubuntu     |  Centos | rhel|
+|----------:|:----------:|:-------------:|:---------:|:---------:|
 |ImageMagick| √ |  √ | √ |
 |ffmpeg| √ |  √ | √ |
 |ffmpeg2theora| √ |  √ | √ |
 |ufraw| √ |  √ | √ |
+|imagemagick| √ |  √ | √ |
 |ccextractor| √ |X| √ |
 |libreoffice| √ |  √ | √ |
 |libwpd-tools| √ |  √ | √ |
 |perl-Image-ExifTool| √ |  √ | √ |
 |ghostscript| √ |  √ | √ |
 |pwgen| √ |  √ | √ |
+|wget| √ |  √ | √ |
+|curl| √ |  √ | √ |
+|net-tools| √ |  √ | √ |
+|tzdata| √ |  √ | √ |
+|gzip| √ |  √ | √ |
+|unzip| √ |  √ | √ |
+|zip| √ |  √ | √ |
+|gnupg2| √ |  √ | √ |
+|dirmngr| √ |  √ | √ |
+|perl| √ |  √ | √ |
+|python3-jinja2| √ |  √ | √ |
+|python3-jinja2-time| √ |  √ | √ |
+|handbrake| √ |  √ | √ |
+|jq| √ |  √ | √ |
+|htop| √ |  √ | √ |
+
+## Where from?
+As we're making all our containers to be largely available and easier to use, we'll be distributing this images through the following registries:
+
+|                           |                           |      |
+| -------------------------:|:------------------------- |:----:|
+| **Docker Registry**       | hub.docker.io             | √    |
+| **Github Registry**       | docker.pkg.github.com     | √    |
+| **Openshift Registry**    |                           | X    |
+| **Amazon Registry**       |                           | X    |
+
+### Versioning format
+
+This package versioning format is based on a combinaison of current time of build and the `jdk` version as follow:
+
+#### Date format
+
+```sh
+VERSION_SUFFIX=$(date -u +'%y.%m')
+```
+
+#### Jdk version
+
+```sh
+jdkversions=(${2:-8 9 11 12 13 14 15})
+```
+
+#### Version Example
+
+```sh
+VERSION_TAG="${jdkversions[@]}.$VERSION_SUFFIX"
+```
 
 ### Usage
 This container can be used through these following steps:
 
 ```dockerfile
-FROM djanta/nuxeo-sdk-${platform}:${jdkversion}-${jdkvariant}
+FROM djanta/nuxeo-sdk:${version}-${os}[-${jdkvariant}]
 ```
 
 #### Pull
 As requested with the request this bundle can be run within the command bellow:
 ```sh
-$ docker pull djanta/nuxeo-sdk-${platform}:${jdkversion}-${jdkvariant}
+$ docker pull djanta/nuxeo-sdk:${version}-${os}[-${jdkvariant}]
 
 # Example for the heaviest version 
-$ docker pull djanta/nuxeo-sdk-debian:8-jdk
+$ docker pull djanta/nuxeo-sdk-debian:15.21.01-debian
 
 # Example for the light version 
-$ docker pull djanta/nuxeo-sdk-debian:8-jdk-slim
+$ docker pull djanta/nuxeo-sdk-debian:15.21.01-debian[-slim]
 ``` 
 
 ## BUILD ENV VARIABLE
@@ -143,6 +170,14 @@ A litteral string value which export the container default **_lang_**.
 **Default value:** `noninteractive` <br/>
 
 A litteral string value which export the container default **_lang_**.
+
+#### TZ
+**Type:** `String` <br/>
+**Default value:** `GMT+0` <br/>
+
+A litteral string value which export the container default **_timezone_**.
+A list of known available timezone is provide within the distribution in the file `.tz`. The timezone can be modified at anytime
+by invoking the following command: `echo "MY PREFERED TIMEZONE" > /etc/timezone`
 
 ## Distribution stats
 |                           |                           |                       ||

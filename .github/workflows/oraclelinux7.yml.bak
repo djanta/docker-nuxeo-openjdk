@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-name: OpenJDK
+name: Oraclelinux7
 
 # On push event ...
 on:
@@ -25,16 +25,22 @@ on:
 
   release:
     types: [created]
+
   # Ensure GitHub actions are not run twice for same commits
   push:
     branches: [master]
     tags: ['*']
+
+  # When pull requesting
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    runs-on: ['ubuntu-latest']
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [10, 11, 12, 13, 14, 15, 16]
     steps:
       - name: Checking out
         uses: actions/checkout@v2
@@ -45,7 +51,7 @@ jobs:
         shell: bash
         run: |
           git submodule update --init --recursive --remote --merge --force
-      - name: GitHub credentials configuration - ${{ matrix.os }}
+      - name: GitHub credentials configuration
         shell: bash
         run: |
           git config user.name "${{ secrets.GH_USER }}"

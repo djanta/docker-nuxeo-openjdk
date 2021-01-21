@@ -58,13 +58,13 @@ jobs:
               echo ::set-output name=version::$(date -u +'%y.%m')
           fi
 
-      - name: Run Gitrivy Vulnerability check
-        uses: homoluctus/gitrivy@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
-          trivy_version: true
-          issue_label: test,report,vulnerability
+#      - name: Run Gitrivy Vulnerability check
+#        uses: homoluctus/gitrivy@v1.0.0
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          image: djanta/nuxeo-sdk-${{ matrix.arch }}:develop
+#          trivy_version: true
+#          issue_label: test,report,vulnerability
 
 #      - name: Run Anchore Vulnerability check
 #        uses: anchore/scan-action@master

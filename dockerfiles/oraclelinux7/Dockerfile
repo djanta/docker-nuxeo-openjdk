@@ -4,7 +4,7 @@ ARG BUILD_JDK_VERSION
 ARG BUILD_JDK_VARIANT
 
 # hadolint ignore=DL1000,DL3003,SC1035
-FROM openjdk:${BUILD_JDK_VERSION:-8}-${BUILD_JDK_VARIANT:-jdk}-oraclelinux7
+FROM openjdk:${BUILD_JDK_VERSION:-10}-${BUILD_JDK_VARIANT:-jdk}-oraclelinux7
 
 # Declaring expected external variable
 ARG BUILD_VERSION
@@ -29,11 +29,10 @@ LABEL org.label-schema.description="DJANTA.IO Nuxeo SDK Base image share across 
 LABEL org.label-schema.vcs-url="https://github.com/djanta/docker-nuxeo-sdk"
 LABEL org.label-schema.vcs-ref=$BUILD_HASH
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV JDK_VERSION=${BUILD_JDK_VERSION:-8}
-ENV JDK_NAME=openjdk-${JDK_VERSION}-${BUILD_JDK_VARIANT:-jdk}
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+#ENV DEBIAN_FRONTEND=noninteractive
+ENV IMAGE_MAGICK_MAX_TREAD=1
+#ENV TZ 'America/Chicago'
+ENV TZ 'GMT+0'
 
 # testing online: https://hadolint.github.io/hadolint/
 # hadolint ignore=SC2155,DL3008,DL3015
@@ -41,35 +40,55 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN \
   set -x \
   && yum -y upgrade \
-  && yum -y install \
-#  java-${JDK_VERSION}-${JDK_NAME} \
-#  java-${JDK_VERSION}-${JDK_NAME}-devel \
-  wget \
-  perl \
-  ImageMagick \
-  ffmpeg \
-  ffmpeg2theora \
-  ufraw \
-  ccextractor \
-  poppler-utils \
-  libreoffice \
-  libwpd-tools \
-  perl-Image-ExifTool \
-  ghostscript \
-  gzip \
-  unzip \
-  zip \
-  gnupg2 \
-  dirmngr \
-  x264 \
-  handbrake \
-  inotify-tools \
+  && yum update -y \
+  && yum install -y \
+  which \
+  locales \
+  tzdata \
+  yum-utils \
+	transport-https \
+	ca-certificates \
+	wget \
+	curl \
   net-tools \
-  pwgen
+	gzip \
+	unzip \
+	zip \
+	gnupg2 \
+	dirmngr \
+	perl \
+	handbrake \
+	imagemagick \
+	pwgen \
+	ffmpeg2theora \
+	ffmpeg \
+	ufraw \
+	ccextractor \
+	x264 \
+	libreoffice \
+	ghostscript \
+	exiftool \
+	poppler-utils \
+	libwpd-tools \
+	inotify-tools \
+	jq \
+	rsync \
+	htop
+
+# Configure timezone
+RUN \
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+  && echo $TZ > /etc/timezone
 
 RUN \
   set -x \
-  && yum clean all
+  && yum clean all -y
+
+# Check if hava has been install ...
+RUN \
+  which java \
+  && java -version \
+  && echo "JAVA_HOME --> $JAVA_HOME"
 
 # enabling utf-8 by default
 ENV LANG en_US.utf8

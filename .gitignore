@@ -54,3 +54,10 @@ Thumbs.db
 # Editor Files
 *~
 *.swp
+
+# Excludes unfinalized distribution docker files
+dockerfiles/fedora
+dockerfiles/opensuse
+dockerfiles/rhel
+dockerfiles/centos
+docs

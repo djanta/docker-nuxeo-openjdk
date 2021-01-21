@@ -22,7 +22,7 @@ all () {
 
 #DIST=${3:-debian}
 #JDK_VERSION=${1:-8}
-JDK_VARIANT=${2:-jdk}
+JDK_VARIANT=${3:-jdk}
 VERSION_SUFFIX=$(date -u +'%y.%m')
 #VERSION_TAG="$JDK_VERSION.$VERSION_SUFFIX"
 #FULL_TAG="$VERSION_TAG-$DIST"
@@ -32,18 +32,16 @@ VERSION_SUFFIX=$(date -u +'%y.%m')
 #docker image inspect --format='' djanta/nuxeo-sdk:8.10-debian
 
 # shellcheck disable=SC2206
-distributions=(${1:-debian ubuntu centos fedora opensuse oracle oraclelinux7 oraclelinux8 rhel})
+distributions=(${1:-debian ubuntu centos fedora opensuse oraclelinux7 rhel})
 
 # shellcheck disable=SC2206
-jdkversions=(${2:-8 9 11 12 13 14 15 16})
+jdkversions=(${2:-8 9 11 12 13 14 15})
 
-for jdkver in "${jdkversions[@]}";
-do
+for jdkver in "${jdkversions[@]}"; do
   VERSION_TAG="$jdkver.$VERSION_SUFFIX"
   BUILD_VERSION=$(date -u +'%y.%m.%d')-"$jdkver"
 
-  for dist in "${distributions[@]}";
-    do
+  for dist in "${distributions[@]}"; do
     FULL_TAG="$VERSION_TAG-$dist"
     docker --debug build -t djanta/nuxeo-sdk:"$FULL_TAG" \
       --build-arg RELEASE_VERSION="$VERSION_TAG" \
