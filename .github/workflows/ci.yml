@@ -26,7 +26,7 @@ on:
 #    branches:
 #      - master
 jobs:
-  debian:
+  build:
     runs-on: ubuntu-latest
 #    strategy:
 #      matrix:
@@ -98,11 +98,12 @@ jobs:
           GITHUB_SLOG_REGISTRY: $GITHUB_REGISTRY/$GITHUB_REPOSITORY
           DOCKER_HUB_REGISTRY: hub.docker.com
           JDK_VARIANT: jdk
-          JDK_VERSION: "8 11 12 13"
-          DISTRIBUTION: "debian ubuntu"
           REGISTRIES: "hub.docker.com docker.pkg.github.com"
         run: |
           VERSION_SUFFIX=$(date -u +'%y.%m')
+          JDK_VERSION: "8 11 12 13"
+          DISTRIBUTION: "debian ubuntu"
+
           for jdkver in "${JDK_VERSION[@]}"; do \
             VERSION_TAG="$jdkver.$VERSION_SUFFIX"; \
             BUILD_VERSION=$(date -u +'%y.%m.%d')-"$jdkver"; \
