@@ -92,7 +92,7 @@ jobs:
         env:
           DOCKER_HUB_REGISTRY: registry.hub.docker.com
         run: |
-          docker login ${DOCKER_HUB_REGISTRY} --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.$DOCKER_PASSWORD }}
+          docker login ${DOCKER_HUB_REGISTRY} --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Image & Deploy
         env:
