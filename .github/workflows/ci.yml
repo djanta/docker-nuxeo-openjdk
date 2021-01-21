@@ -104,7 +104,7 @@ jobs:
           JDK_VARIANT: jdk
         run: |
           VERSION_SUFFIX=$(date -u +'%y.%m')
-          JDK_VERSION=(8 11 12 13)
+          JDK_VERSION=(8 11 13 14)
           DISTRIBUTION=(debian ubuntu)
 
           for jdkver in "${JDK_VERSION[@]}"; do \
