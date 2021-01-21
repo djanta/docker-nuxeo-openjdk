@@ -14,16 +14,15 @@
 These instructions will cover usage information and for the docker container 
 
 ## Introduction
-The main purposes of this project is to provide a high level container which'll come up with the minimum and essentials tools required by `nuxeo` 
-framework to be functionning. Please do keep in mind that, this container will not bring up the `nuxeo` server instance. To have a ready to do `nuxeo`
+The main purposes of this project are to provide a high-level container that comes up with the minimum and essentials tools required by `Nuxeo`
+the framework to be functioning. Please do keep in mind that, this container will not bring up the `Nuxeo` server instance. To have a ready to do `Nuxeo`
 container, [used the following image instead](https://github.com/djanta/docker-nuxeo-server).
-To build your own image from this, follow the steps above and with lucky you will have a working container ;)
-
+To build your own image from this, follow the steps above, and with luck, you'll have a working container ;)
 ## Main tools
 
-First of all, base on many feedback inquiries we've got, I can stress enough that, this `SDK` image come up with diffrent `*nix` based distribution.
-As for today, we've not published any `windows` based distribution. In our team and for most of our clients, we mostly use this `openjdk` version, but you are free to
-choose your favorite distribution (as long as your are able to manage distribution specific problems without help from
+First of all, base on many feedback inquiries we've got, I can stress enough that, this `SDK` image comes up with different `*nix` based distribution.
+As for today, we've not published any `windows` based distribution. In our team and for most of our clients, we mostly use this `OpenJDK` version, but you are free to
+choose your favorite distribution (as long as you're able to manage distribution specific problems without help from
 US).
 
 ### Prerequisities
