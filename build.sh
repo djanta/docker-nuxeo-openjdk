@@ -20,6 +20,8 @@ all () {
   echo "Build all ... "
 }
 
+#https://github.com/marketplace/actions/docker-buildx
+
 #DIST=${3:-debian}
 #JDK_VERSION=${1:-8}
 JDK_VARIANT=${3:-jdk}
