@@ -113,8 +113,8 @@ jobs:
           REGISTRIES: "hub.docker.com docker.pkg.github.com"
         run: |
           VERSION_SUFFIX=$(date -u +'%y.%m')
-          JDK_VERSION=(8 11 12 13)
-          DISTRIBUTION=(debian ubuntu)
+          JDK_VERSION=(8)
+          DISTRIBUTION=(debian)
 
           for jdkver in "${JDK_VERSION[@]}"; do \
             VERSION_TAG="$jdkver.$VERSION_SUFFIX"; \
