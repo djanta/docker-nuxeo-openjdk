@@ -82,6 +82,11 @@ jobs:
         run: |
           docker pull "$DOCKER_IMAGE"
 
+      - name: Cloning docker official
+        shell: bash
+        run: |
+          git clone https://github.com/docker-library/official-images.git ~/official-images
+
       - name: Build Image & Deploy
         env:
           GITHUB_USERNAME: ${{ secrets.GH_USER }}
