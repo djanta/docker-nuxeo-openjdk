@@ -125,8 +125,6 @@ jobs:
             done; \
           done
 
-#          ~/official-images/test/run.sh djanta/nuxeo-sdk:"$FULL_TAG"; \
-
           docker images
 
 #      - name: 'Run Docker test'
