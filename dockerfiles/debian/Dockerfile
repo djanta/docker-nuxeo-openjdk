@@ -99,6 +99,15 @@ RUN \
 	rsync \
 	htop
 
+# Installing Metricbeat for docker internal monitoring purpose
+##
+# Credit: https://www.elastic.co/guide/en/beats/metricbeat/6.4/metricbeat-installation.html
+##
+RUN \
+  set -x \
+  && curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-6.4.3-amd64.deb \
+  && dpkg -i metricbeat-6.4.3-amd64.deb
+
 # Configure timezone
 RUN \
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
