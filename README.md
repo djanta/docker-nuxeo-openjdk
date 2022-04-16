@@ -104,6 +104,7 @@ In addition, runtime support is provided for:
 |handbrake| √ |  √ | √ |
 |jq| √ |  √ | √ |
 |htop| √ |  √ | √ |
+|ranger| √ |  √ | √ |
 
 ## Where from?
 As we're making all our containers to be largely available and easier to use, we'll be distributing this images through the following registries:

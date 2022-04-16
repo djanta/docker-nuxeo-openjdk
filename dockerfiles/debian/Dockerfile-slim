@@ -77,36 +77,14 @@ RUN \
 	gnupg2 \
 	dirmngr \
 	perl \
-  pwgen \
 # https://pypi.org/project/Jinja2/
 	python3-jinja2 \
 	python3-jinja2-time \
-	handbrake \
-## Conversion tools ##
-	imagemagick \
-	ffmpeg2theora \
-	ffmpeg \
-	ufraw \
-	ccextractor \
-	x264 \
-	libreoffice \
-	ghostscript \
-	exiftool \
-	poppler-utils \
-	libwpd-tools \
+	pwgen \
 	jq \
 	rsync \
 	htop \
 	ranger
-
-## Installing Metricbeat for docker internal monitoring purpose
-###
-## Credit: https://www.elastic.co/guide/en/beats/metricbeat/6.4/metricbeat-installation.html
-###
-#RUN \
-#  set -x \
-#  && curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-6.4.3-amd64.deb \
-#  && dpkg -i metricbeat-6.4.3-amd64.deb
 
 # Configure timezone
 RUN \

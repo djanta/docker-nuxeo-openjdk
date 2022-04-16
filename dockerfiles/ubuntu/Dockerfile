@@ -105,7 +105,8 @@ RUN \
 	inotify-tools \
 	jq \
 	rsync \
-  htop
+  htop \
+  ranger
 
 # Configure timezone
 RUN \

@@ -39,6 +39,7 @@ distributions=(${1:-debian ubuntu centos fedora opensuse oraclelinux7 rhel})
 # shellcheck disable=SC2206
 jdkversions=(${2:-8 9 11 12 13 14 15})
 
+# shellcheck disable=SC2046
 for jdkver in "${jdkversions[@]}"; do
   VERSION_TAG="$jdkver.$VERSION_SUFFIX"
   BUILD_VERSION=$(date -u +'%y.%m.%d')-"$jdkver"
@@ -55,12 +56,3 @@ for jdkver in "${jdkversions[@]}"; do
       --file $(pwd)/dockerfiles/$dist/Dockerfile .
   done
 done
-
-#docker --debug build -t djanta/nuxeo-sdk:"$FULL_TAG" \
-#  --build-arg RELEASE_VERSION="$VERSION_TAG" \
-#  --build-arg BUILD_VERSION="$BUILD_VERSION" \
-#  --build-arg BUILD_HASH=$(git rev-parse HEAD) \
-#  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-#  --build-arg BUILD_JDK_VERSION="$JDK_VERSION" \
-#  --build-arg BUILD_JDK_VARIANT="$JDK_VARIANT" \
-#  --file $(pwd)/dockerfiles/$DIST/Dockerfile .
