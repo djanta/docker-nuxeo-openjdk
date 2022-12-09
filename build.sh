@@ -109,9 +109,10 @@ exists() {
 argv arg_sdk '--sdk' "${@:1:$#}"
 argv arg_version '--version' "${@:1:$#}"
 argv arg_distrib '--distrib' "${@:1:$#}"
-argv arg_push '--push' "${@:1:$#}"
 argv arg_platform '--platform' "${@:1:$#}"
 argv arg_envfile '--env-file' "${@:1:$#}"
+
+exists arg_push '--push' "${@:1:$#}"
 
 # shellcheck disable=SC2206
 DISTRIBUTIONS=(${arg_distrib:-centos corretto})
@@ -127,6 +128,9 @@ LTS=$((--YEAR))
 # shellcheck disable=SC2034
 VERSION_TAG=${LTS}.$((10#$MONTH))
 
+#--build-arg BUILD_SDK_VERSION="${VERSION_TAG}" \
+#--build-arg BUILD_DISTRIB="${distrib}" \
+
 for distrib in "${DISTRIBUTIONS[@]}"; do
   tagv="djanta/nuxeo-sdk:"${VERSION_TAG}-${distrib}""
   docker --debug build -t "${tagv}" \
@@ -134,12 +138,11 @@ for distrib in "${DISTRIBUTIONS[@]}"; do
     --build-arg BUILD_HASH=$(git rev-parse HEAD) \
     --build-arg RELEASE_VERSION="$(date -u +'%Y.%m.%d')-${distrib}" \
     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-    --build-arg BUILD_DISTRIB="${distrib}" \
-    --build-arg BUILD_SDK_VERSION="${VERSION_TAG}" \
     --file $(pwd)/dockerfiles/${distrib}/Dockerfile .
 
   # shellcheck disable=SC2128
   if [ -n "${PUSH}" ] && [ "${PUSH}" == "true" ]; then
+    echo "Publishing tag: ${tagv} ..."
     docker push "${tagv}"
   fi
 done
