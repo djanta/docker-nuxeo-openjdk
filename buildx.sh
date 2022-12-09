@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ---------------------------------------------------------------------------
-# build.sh - This script will be use to provide our platform deployment build.sh architecture
+# buildx.sh - This script will be use to provide our platform deployment build.sh architecture
 #
 # Copyright 2015, Stanislas Koffi ASSOUTOVI <team.docker@djanta.io>
 # This program is free software: you can redistribute it and/or modify
@@ -23,50 +23,6 @@ case "$(uname -s)" in
   Linux) basedir=$(dirname "$(readlink -f "$0" || echo "$argv0")");;
   *CYGWIN*) basedir=`cygpath -w "$basedir"`;;
 esac
-
-
-####
-# Check whether the given command has existed
-###
-command_exists () {
-  command -v "$1" >/dev/null 2>&1;
-}
-
-clean_up() { # Perform pre-exit housekeeping
-  return
-}
-
-error_exit() {
-  echo -e "${PROGNAME:-$(echo "$0")}: ${1:-"Unknown Error"}" >&2
-  clean_up
-  exit ${2:-1}
-}
-
-graceful_exit() {
-  clean_up
-  exit
-}
-
-signal_exit() { # Handle trapped signals
-  case $1 in
-    INT)
-      error_exit "Program interrupted by user" ;;
-    TERM)
-      echo -e "\n$PROGNAME: Program terminated" >&2
-      graceful_exit ;;
-    *)
-      error_exit "$PROGNAME: Terminating on unknown signal" ;;
-  esac
-}
-
-# shellcheck disable=SC2145
-die() {
-    ret=${1}
-    shift
-    # shellcheck disable=SC2059
-    printf "${CYAN}${@}${NORMAL}\n" 1>&2
-    exit "${ret}"
-}
 
 lookup() {
   if [[ -z "$1" ]] ; then
@@ -109,10 +65,9 @@ exists() {
 argv arg_sdk '--sdk' "${@:1:$#}"
 argv arg_version '--version' "${@:1:$#}"
 argv arg_distrib '--distrib' "${@:1:$#}"
+argv arg_push '--push' "${@:1:$#}"
 argv arg_platform '--platform' "${@:1:$#}"
 argv arg_envfile '--env-file' "${@:1:$#}"
-
-exists arg_push '--push' "${@:1:$#}"
 
 # shellcheck disable=SC2206
 DISTRIBUTIONS=(${arg_distrib:-centos corretto})
@@ -123,28 +78,34 @@ PUSH=(${arg_push:-false})
 YEAR=$(date -u +'%Y')
 MONTH=$(date -u +'%m')
 
+#PLATFORM=${arg_platform:-"linux/386,linux/amd64,linux/arm64"}
+#PLATFORM="linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x"
+PLATFORM=${arg_platform:-"linux/amd64,linux/arm64"}
+
+ENV_FILE=${arg_envfile:-"./build/.env"}
+
 LTS=$((--YEAR))
 
 # shellcheck disable=SC2034
 VERSION_TAG=${LTS}.$((10#$MONTH))
 
-#--build-arg BUILD_SDK_VERSION="${VERSION_TAG}" \
-#--build-arg BUILD_DISTRIB="${distrib}" \
+#    --output "type=image,push=${PUSH}" \
+
+#    --no-cache \
+#    --load \
 
 for distrib in "${DISTRIBUTIONS[@]}"; do
-  tagv="djanta/nuxeo-sdk:"${VERSION_TAG}-${distrib}""
-  docker --debug build -t "${tagv}" \
+  docker buildx build \
+    --platform "$PLATFORM" \
     --build-arg BUILD_VERSION="${VERSION_TAG}" \
     --build-arg BUILD_HASH=$(git rev-parse HEAD) \
     --build-arg RELEASE_VERSION="$(date -u +'%Y.%m.%d')-${distrib}" \
     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-    --file $(pwd)/dockerfiles/${distrib}/Dockerfile .
-
-  # shellcheck disable=SC2128
-  if [ -n "${PUSH}" ] && [ "${PUSH}" == "true" ]; then
-    echo "Publishing tag: ${tagv} ..."
-    docker push "${tagv}"
-  fi
+    --build-arg BUILD_DISTRIB="${distrib}" \
+    --progress auto \
+    --output "type=image,push=${PUSH}" \
+    --tag djanta/nuxeo-sdk:"${VERSION_TAG}-${distrib}" \
+    --file $(pwd)/dockerfiles/${distrib}/Dockerfile ./
 done
 
 #docker buildx prune -f -a --verbose

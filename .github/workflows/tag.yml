@@ -15,11 +15,10 @@
 #
 
 name: Release
-
 on:
   push:
     branches:
-      - release-xxxxxx
+      - master-xxxxx
 
 jobs:
   openjdk:
@@ -30,6 +29,7 @@ jobs:
         os: [ubuntu-latest]
         version: [8, 11, 14, 15, 16]
         variant: [jdk]
+        distributions: [centos]
     steps:
 #      - name : GITHUB CONTEXT
 #        env:
@@ -91,6 +91,22 @@ jobs:
         id: changelog
         run: |
           echo "::set-output name=CHANGELOG::$(cat CHANGELOG.md)"
+
+      #
+      ## Source: https://octokit.github.io/rest.js/v18#actions-create-workflow-dispatch
+      ## https://github.com/up9cloud/telegram-bot-send.sh/blob/master/.github/workflows/main.yml
+      ##
+      - name: Tigger server build each time a new sdk is release
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'djanta',
+              repo: 'docker-nuxeo-server',
+              workflow_id: 'manual.yml',
+              ref: 'master'
+            })
 
 #      - name: Create Github Release
 #        id: release
