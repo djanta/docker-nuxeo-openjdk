@@ -1,0 +1,226 @@
+#
+# Copyright 2019-2020 DJANTA, LLC (https://www.djanta.io)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed toMap in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Release
+on:
+  push:
+    branches:
+      - master-xxxxx
+
+jobs:
+  openjdk:
+#    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        version: [8, 11, 14, 15, 16]
+        variant: [jdk]
+        distributions: [centos]
+    steps:
+#      - name : GITHUB CONTEXT
+#        env:
+#          GITHUB_CONTEXT: ${{ toJson(github) }}
+#        run: echo "$GITHUB_CONTEXT"
+
+      - name: Checking out
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          submodules: true
+      - name: Submodules Sync
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive --remote --merge --force --depth=3
+
+      - name: GitHub credentials configuration - (${{ matrix.os }})
+        shell: bash
+        run: |
+          git config user.name "${{ secrets.GH_USER }}"
+          git config user.email "${{ secrets.GH_USER_EMAIL }}"
+          git config credential.helper "store --file=.git/credentials"
+          echo "https://${{ secrets.GH_TOKEN }}:@github.com" > .git/credentials
+
+#      - name: Increment Step Major
+#        id: increment-semver-major
+#        fail-fast: false
+#        uses: Benbentwo/increment-semver@master
+#        with:
+#          version-level: '-M'
+
+      - name: Create or Update version ID
+#        # if repvious increment-semver-major step failed
+#        if: ${{ failure() }}
+        id: version
+        run: |
+          echo "GITHUB_REF is a tag you set for the release"
+          echo "Your GitHub ref: ${GITHUB_REF}"
+          VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
+          echo "Preparing version: ${VERSION}"
+          echo "__version__ = \"${VERSION}\"" > __version__.py
+          echo "##[set-output name=version;]$(echo ${VERSION})"
+
+          echo ::set-env name=version::${VERSION})
+          if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=version::$(date -u +'%y.%m')
+          fi
+      - name: Create & Release To (Github Registry & Docker Hub)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_USER: ${{ secrets.GH_USER }}
+          GITHUB_USERNAME: ${{ secrets.GH_USER }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo "Create & Release To (Github Registry & Docker Hub)"
+
+      - name: Get Changelog
+        id: changelog
+        run: |
+          echo "::set-output name=CHANGELOG::$(cat CHANGELOG.md)"
+
+      #
+      ## Source: https://octokit.github.io/rest.js/v18#actions-create-workflow-dispatch
+      ## https://github.com/up9cloud/telegram-bot-send.sh/blob/master/.github/workflows/main.yml
+      ##
+      - name: Tigger server build each time a new sdk is release
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'djanta',
+              repo: 'docker-nuxeo-server',
+              workflow_id: 'manual.yml',
+              ref: 'master'
+            })
+
+#      - name: Create Github Release
+#        id: release
+#        uses: actions/create-release@latest
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: ${{ steps.version.outputs.version }}
+#          release_name: Release v${{ steps.version.outputs.version }}
+#          body: |
+#            #### Changes in this Release:
+#            ${{ steps.changelog.outputs.CHANGELOG }}
+#          draft: false
+#          prerelease: false
+
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    # Ensure test job passes before pushing image.
+    needs: test
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "$default-branch" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+
+  legacy:
+#    if: (startsWith(github.event.head_commit.message, 'prepare release') == false)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        version: [8]
+        variant: [jdk]
+    steps:
+#      - name : GITHUB CONTEXT
+#        env:
+#          GITHUB_CONTEXT: ${{ toJson(github) }}
+#        run: echo "$GITHUB_CONTEXT"
+
+      - name: Checking out
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          submodules: true
+      - name: Submodules Sync
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive --remote --merge --force --depth=3
+      - name: GitHub credentials configuration - (${{ matrix.os }})
+        shell: bash
+        run: |
+          git config user.name "${{ secrets.GH_USER }}"
+          git config user.email "${{ secrets.GH_USER_EMAIL }}"
+          git config credential.helper "store --file=.git/credentials"
+          echo "https://${{ secrets.GH_TOKEN }}:@github.com" > .git/credentials
+
+#      - name: Increment Step Major
+#        id: increment-semver-major
+#        fail-fast: false
+#        uses: Benbentwo/increment-semver@master
+#        with:
+#          version-level: '-M'
+
+      - name: Create or Update version ID
+#        # if repvious increment-semver-major step failed
+#        if: ${{ failure() }}
+        id: version
+        run: |
+          echo "GITHUB_REF is a tag you set for the release"
+          echo "Your GitHub ref: ${GITHUB_REF}"
+          VERSION=`echo "${GITHUB_REF}" | cut -f 3 -d "/"`
+          echo "Preparing version: ${VERSION}"
+          echo "__version__ = \"${VERSION}\"" > __version__.py
+          echo "##[set-output name=version;]$(echo ${VERSION})"
+
+          echo ::set-env name=version::${VERSION})
+          if [[ steps.version.outputs.version != ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=version::$(date -u +'%y.%m')
+          fi
+      - name: Create & Release To (Github Registry & Docker Hub)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_USER: ${{ secrets.GH_USER }}
+          GITHUB_USERNAME: ${{ secrets.GH_USER }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo "Create & Release To (Github Registry & Docker Hub)"
+
+      - name: Get Changelog
+        id: changelog
+        run: |
+          echo "::set-output name=CHANGELOG::$(cat CHANGELOG.md)"
