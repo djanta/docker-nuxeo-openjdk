@@ -28,7 +28,7 @@ LABEL org.label-schema.vcs-ref=$BUILD_HASH
 # Configure Zulu Repository
 RUN \
   rpm --import http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems \
-  && rpm --install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm
+  && rpm --install http://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm
 
 RUN yum -y update \
   && yum -y --setopt=skip_missing_names_on_install=False install \

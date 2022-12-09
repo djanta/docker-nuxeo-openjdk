@@ -114,7 +114,7 @@ argv arg_platform '--platform' "${@:1:$#}"
 argv arg_envfile '--env-file' "${@:1:$#}"
 
 # shellcheck disable=SC2206
-DISTRIBUTIONS=(${arg_distrib:-centos})
+DISTRIBUTIONS=(${arg_distrib:-centos corretto})
 
 # shellcheck disable=SC2206
 PUSH=(${arg_push:-false})
@@ -128,14 +128,20 @@ LTS=$((--YEAR))
 VERSION_TAG=${LTS}.$((10#$MONTH))
 
 for distrib in "${DISTRIBUTIONS[@]}"; do
-  docker --debug build -t djanta/nuxeo-sdk:"${VERSION_TAG}-${distrib}" \
-  --build-arg BUILD_VERSION="${VERSION_TAG}" \
-  --build-arg BUILD_HASH=$(git rev-parse HEAD) \
-  --build-arg RELEASE_VERSION="$(date -u +'%Y.%m.%d')-${distrib}" \
-  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-  --build-arg BUILD_DISTRIB="${distrib}" \
-  --build-arg BUILD_SDK_VERSION="${VERSION_TAG}" \
-  --file $(pwd)/dockerfiles/${distrib}/Dockerfile .
+  tagv="djanta/nuxeo-sdk:"${VERSION_TAG}-${distrib}""
+  docker --debug build -t "${tagv}" \
+    --build-arg BUILD_VERSION="${VERSION_TAG}" \
+    --build-arg BUILD_HASH=$(git rev-parse HEAD) \
+    --build-arg RELEASE_VERSION="$(date -u +'%Y.%m.%d')-${distrib}" \
+    --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+    --build-arg BUILD_DISTRIB="${distrib}" \
+    --build-arg BUILD_SDK_VERSION="${VERSION_TAG}" \
+    --file $(pwd)/dockerfiles/${distrib}/Dockerfile .
+
+  # shellcheck disable=SC2128
+  if [ -n "${PUSH}" ] && [ "${PUSH}" == "true" ]; then
+    docker push "${tagv}"
+  fi
 done
 
 #docker buildx prune -f -a --verbose

@@ -70,7 +70,7 @@ argv arg_platform '--platform' "${@:1:$#}"
 argv arg_envfile '--env-file' "${@:1:$#}"
 
 # shellcheck disable=SC2206
-DISTRIBUTIONS=(${arg_distrib:-centos})
+DISTRIBUTIONS=(${arg_distrib:-centos corretto})
 
 # shellcheck disable=SC2206
 PUSH=(${arg_push:-false})
@@ -91,6 +91,9 @@ VERSION_TAG=${LTS}.$((10#$MONTH))
 
 #    --output "type=image,push=${PUSH}" \
 
+#    --no-cache \
+#    --load \
+
 for distrib in "${DISTRIBUTIONS[@]}"; do
   docker buildx build \
     --platform "$PLATFORM" \
@@ -100,8 +103,7 @@ for distrib in "${DISTRIBUTIONS[@]}"; do
     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
     --build-arg BUILD_DISTRIB="${distrib}" \
     --progress auto \
-    --no-cache \
-    --load \
+    --output "type=image,push=${PUSH}" \
     --tag djanta/nuxeo-sdk:"${VERSION_TAG}-${distrib}" \
     --file $(pwd)/dockerfiles/${distrib}/Dockerfile ./
 done

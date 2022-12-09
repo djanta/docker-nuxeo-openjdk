@@ -7,7 +7,7 @@
 [![pull badge](https://img.shields.io/docker/pulls/djanta/nuxeo-sdk.svg)](https://github.com/djanta/docker-nuxeo-sdk)
 [![Docker image](https://images.microbadger.com/badges/image/djanta/nuxeo-sdk.svg)](https://microbadger.com/images/djanta/docker-nuxeo-sdk)
 
-> 1.0.0
+> 2021.12
 
 ## Getting Started
 
@@ -18,10 +18,19 @@ The main purposes of this project are to provide a high-level container that com
 the framework to be functioning. Please do keep in mind that, this container will not bring up the `Nuxeo` server instance. To have a ready to do `Nuxeo`
 container, [used the following image instead](https://github.com/djanta/docker-nuxeo-server).
 To build your own image from this, follow the steps above, and with luck, you'll have a working container ;)
+
+## Caution
+
+This image aim to provide the `SDK` level in support for `Nuxeo` base server distribtion. Therefore, all thrid party sofware provided within
+this image have been tested and ensure that all required builtin with `nuxeo` base are functionning properly. 
+
+Yo can as needed build from this image e.g: `FROM djanta/nuxeo-sdk:${VERSION_TAG}` and just install your target nuxeo server distribution.
+
 ## Main tools
 
-First of all, base on many feedback inquiries we've got, I can stress enough that, this `SDK` image comes up with different `*nix` based distribution.
-As for today, we've not published any `windows` based distribution. In our team and for most of our clients, we mostly use this `OpenJDK` version, but you are free to
+First of all, base on many feedback inquiries we've got, I can stress enough that, this `SDK` image comes up as of now with mainly `centos:7` and amazon `corretto:11-alpine-jdk`.
+As for today, we've not yet published any `windows` based distribution.
+In our team and for most of our clients, we mostly use this `JDK 11 azul` version, but you are free to
 choose your favorite distribution (as long as you're able to manage distribution specific problems without help from
 US).
 
@@ -43,78 +52,57 @@ If you want to install some additional package, here's one important and easier 
 
 Remote Targets
 
-| Platform                     | Versions                                         | Architectures |
-| ---------------------------- | ------------------------------------------------ | ------------- |
-| Debian                       | buster                                           | i386, x86_64  |
-| Ubuntu                       | groovy                                           | x86, x86_64   |
-| CentOS                       | 7                                                | i386, x86_64  |
-| Oracle Enterprise Linux      | 7, 8                                             | i386, x86_64  |
-| Red Hat Enterprise Linux     | 5, 6, 7                                          | i386, x86_64  |
-| SUSE Linux Enterprise Server | 11, 12                                           | x86_64        |
-| Fedora                       |                                                  | x86_64        |
-| OpenSUSE                     | 13, 42                                           | x86_64        |
-| Arch Linux                   |                                                  | x86_64        |
-
-In addition, runtime support is provided for:
-
-| Platform | Versions | Arch   |
-| -------- | -------- | ------ |
-| Debian   | 8, 9     | x86_64 |
-| Ubuntu   | 12.04+   | x86_64 |
-| RHEL     | 6, 7     | x86_64 |
+| Platform | Versions | Architectures |
+|----------|---------| ------------- |
+| CentOS   | 7       | i386, x86_64  |
+| Corretto   | 11        | i386, x86_64  |
 
 ## Supported JDK
 
-| | Debian   |      Ubuntu     |      Centos     |      Fedora     |      Opensuse     |  rhel |  OracleLinux7 |
-|:----------:|:----------:|:----------:|:-------------:|:-------------:|:-------------:|:---------:|:---------:|
-|8| √ |  √ | √ | X | X | X | X |
-|9| - |  - | - | - | - | - | - |
-|11| √ |  √ | √ | X | X | X | X |
-|14| √ |  √ | √ | X | X | X | X |
-|15| √ |  √ | √ | X | X | X | X |
-|16| √ |  √ | √ | X | X | X | X |
+| | Centos   | Corretto | Debian |      Fedora     |      Opensuse     |  rhel |  OracleLinux7 |
+|:----------:|:----------:|:--------:|:------:|:-------------:|:-------------:|:---------:|:---------:|
+|11| √ |    √     |   X    | X | X | X | X |
 
 ## Installed Software
 
-| | Debian   |      Ubuntu     |  Centos | rhel|
-|----------:|:----------:|:-------------:|:---------:|:---------:|
-|ImageMagick| √ |  √ | √ |
-|ffmpeg| √ |  √ | √ |
-|ffmpeg2theora| √ |  √ | √ |
-|ufraw| √ |  √ | √ |
-|imagemagick| √ |  √ | √ |
-|ccextractor| √ |X| √ |
-|libreoffice| √ |  √ | √ |
-|libwpd-tools| √ |  √ | √ |
-|perl-Image-ExifTool| √ |  √ | √ |
-|ghostscript| √ |  √ | √ |
-|pwgen| √ |  √ | √ |
-|wget| √ |  √ | √ |
-|curl| √ |  √ | √ |
-|net-tools| √ |  √ | √ |
-|tzdata| √ |  √ | √ |
-|gzip| √ |  √ | √ |
-|unzip| √ |  √ | √ |
-|zip| √ |  √ | √ |
-|gnupg2| √ |  √ | √ |
-|dirmngr| √ |  √ | √ |
-|perl| √ |  √ | √ |
-|python3-jinja2| √ |  √ | √ |
-|python3-jinja2-time| √ |  √ | √ |
-|handbrake| √ |  √ | √ |
-|jq| √ |  √ | √ |
-|htop| √ |  √ | √ |
-|ranger| √ |  √ | √ |
+| | Centos | Corretto | --  | --  |
+|----------:|:------:|:--------:|:---:|:---:|
+|ImageMagick|   √    |    √     |  √  |
+|ffmpeg|   √    |    √     |  √  |
+|ffmpeg2theora|   √    |    √     |  √  |
+|ufraw|   √    |    √     |  √  |
+|imagemagick|   √    |    √     |  √  |
+|ccextractor|   √    |    √     |  X  |
+|libreoffice|   √    |    √     |  √  |
+|libwpd-tools|   √    |    √     |  √  |
+|perl-Image-ExifTool|   √    |    √     |  √  |
+|ghostscript|   √    |    √     |  √  |
+|ca-certificates|   √    |    √     |  X  |
+|yum-utils|   √    |    X     |  X  |
+|pwgen|   √    |    √     |  √  |
+|wget|   √    |    √     |  √  |
+|curl|   √    |    √     |  √  |
+|tzdata|   √    |    √     |  √  |
+|gzip|   √    |    √     |  √  |
+|unzip|   √    |    √     |  √  |
+|zip|   √    |    √     |  √  |
+|gnupg2|   √    |    √     |  √  |
+|dirmngr|   √    |    √     |  √  |
+|perl|   √    |    √     |  √  |
+|py3-jinja2|   X    |    √     |  X  |
+|jq|   √    |    √     |  √  |
+|htop|   √    |    √     |  √  |
+|ranger|   √    |    √     |  √  |
 
 ## Where from?
 As we're making all our containers to be largely available and easier to use, we'll be distributing this images through the following registries:
 
-|                           |                           |      |
-| -------------------------:|:------------------------- |:----:|
-| **Docker Registry**       | hub.docker.io             | √    |
-| **Github Registry**       | docker.pkg.github.com     | √    |
-| **Openshift Registry**    |                           | X    |
-| **Amazon Registry**       |                           | X    |
+|                           |                           |     |
+| -------------------------:|:------------------------- |:---:|
+| **Docker Registry**       | hub.docker.io             |  √  |
+| **Github Registry**       | docker.pkg.github.com     |  X  |
+| **Openshift Registry**    |                           |  X  |
+| **Amazon Registry**       |                           |  X  |
 
 ### Versioning format
 
@@ -126,35 +114,26 @@ This package versioning format is based on a combinaison of current time of buil
 VERSION_SUFFIX=$(date -u +'%y.%m')
 ```
 
-#### Jdk version
+#### Version Tagging
 
 ```sh
-jdkversions=(${2:-8 9 11 12 13 14 15})
-```
-
-#### Version Example
-
-```sh
-VERSION_TAG="${jdkversions[@]}.$VERSION_SUFFIX"
+VERSION_TAG="${VERSION_SUFFIX}-${DISTRIBUTION}"
 ```
 
 ### Usage
 This container can be used through these following steps:
 
 ```dockerfile
-FROM djanta/nuxeo-sdk:${version}-${os}[-${jdkvariant}]
+FROM djanta/nuxeo-sdk:${VERSION_TAG}
 ```
 
 #### Pull
 As requested with the request this bundle can be run within the command bellow:
 ```sh
-$ docker pull djanta/nuxeo-sdk:${version}-${os}[-${jdkvariant}]
+$ docker pull djanta/nuxeo-sdk:${VERSION_TAG}
 
-# Example for the heaviest version 
-$ docker pull djanta/nuxeo-sdk-debian:15.21.01-debian
-
-# Example for the light version 
-$ docker pull djanta/nuxeo-sdk-debian:15.21.01-debian[-slim]
+# Example for the LTS 2021 build in December for `centos` 
+$ docker pull djanta/nuxeo-sdk-debian:2021.12-contos
 ``` 
 
 ## BUILD ENV VARIABLE

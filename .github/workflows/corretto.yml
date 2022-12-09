@@ -22,7 +22,7 @@ on:
   push:
     branches:
       - develop-zzzzzzz
-    tags: ['*']
+#    tags: ['*']
 
 #  release:
 #    types: [created]

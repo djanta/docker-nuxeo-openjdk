@@ -19,7 +19,7 @@ name: Release
 on:
   push:
     branches:
-#      - release
+      - release-xxxxxx
 
 jobs:
   openjdk:
