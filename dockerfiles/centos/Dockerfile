@@ -9,6 +9,7 @@ ARG BUILD_VERSION
 ARG RELEASE_VERSION
 ARG BUILD_DATE
 ARG BUILD_HASH
+ARG BUILD_CCEXTRACTOR_VERSION
 
 LABEL description="DJANTA.IO Nuxeo SDK image share across all our downstream nuxeo LTS customization"
 LABEL version="$RELEASE_VERSION"
@@ -33,7 +34,6 @@ RUN \
 RUN yum -y update \
   && yum -y --setopt=skip_missing_names_on_install=False install \
     epel-release \
-    # install java first to provide it for depend packages (such as libreoffice)
     zulu11-jdk \
   && yum -y --setopt=skip_missing_names_on_install=False install \
     ghostscript \
@@ -48,7 +48,6 @@ RUN yum -y update \
     tar \
     ufraw \
     wget \
-    # Custom install tools
     which \
     tzdata \
     yum-utils \
@@ -75,6 +74,7 @@ RUN \
 
 RUN \
   git clone https://github.com/CCExtractor/ccextractor \
+  && (cd ccextractor/ && git checkout -b feature/${BUILD_CCEXTRACTOR_VERSION:-v0.90} ${BUILD_CCEXTRACTOR_VERSION:-v0.90}) \
   && ( \
       cd ccextractor/linux/ \
       && ./autogen.sh \

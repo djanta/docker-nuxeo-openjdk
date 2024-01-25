@@ -30,6 +30,8 @@ jobs:
       matrix:
         arch: [debian, ubuntu]
         version: [20.06]
+        distrib:
+          - centos
     steps:
       - name: Checking out
         uses: actions/checkout@v2

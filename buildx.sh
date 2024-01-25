@@ -16,6 +16,7 @@
 # more details.
 # ---------------------------------------------------------------------------
 
+# shellcheck disable=SC2001
 argv0=$(echo "$0" | sed -e 's,\\,/,g')
 basedir=$(dirname "$(readlink "$0" || echo "$argv0")")
 
@@ -28,6 +29,7 @@ lookup() {
   if [[ -z "$1" ]] ; then
     echo ""
   else
+    # shellcheck disable=SC2016
     ${AWK} -v "id=$1" 'BEGIN { FS = "=" } $1 == id { print $2 ; exit }' $2
   fi
 }
@@ -62,50 +64,58 @@ exists() {
   done
 }
 
-argv arg_sdk '--sdk' "${@:1:$#}"
-argv arg_version '--version' "${@:1:$#}"
-argv arg_distrib '--distrib' "${@:1:$#}"
-argv arg_push '--push' "${@:1:$#}"
-argv arg_platform '--platform' "${@:1:$#}"
-argv arg_envfile '--env-file' "${@:1:$#}"
+argv argdistrib '--os' "${@:1:$#}"
+argv argpush '--push' "${@:1:$#}"
+argv argplatform '--platform' "${@:1:$#}"
+argv argenvfile '--env-file' "${@:1:$#}"
+argv argltsid '--lts' "${@:1:$#}"
 
 # shellcheck disable=SC2206
-DISTRIBUTIONS=(${arg_distrib:-centos corretto})
+OSLIST=(${argdistrib:-centos})
 
 # shellcheck disable=SC2206
-PUSH=(${arg_push:-false})
+PUSH=(${argpush:-false})
+
+# shellcheck disable=SC2034
+PLATFORM=${argplatform:-'linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/mips64le, linux/mips64, linux/arm/v7, linux/arm/v6'}
+
+# shellcheck disable=SC2034
+ENV_FILE=${argenvfile:-'./build/.env'}
 
 YEAR=$(date -u +'%Y')
 MONTH=$(date -u +'%m')
 
-#PLATFORM=${arg_platform:-"linux/386,linux/amd64,linux/arm64"}
-#PLATFORM="linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x"
-PLATFORM=${arg_platform:-"linux/amd64,linux/arm64"}
-
-ENV_FILE=${arg_envfile:-"./build/.env"}
-
-LTS=$((--YEAR))
+#LTS=$((--YEAR))
+[ -n "$argltsid" ] && LTS=$argltsid || LTS=$YEAR
 
 # shellcheck disable=SC2034
-VERSION_TAG=${LTS}.$((10#$MONTH))
+TAG_ID=${LTS}.$((10#$MONTH))
+#TAG_ID=${YEAR}.$((10#$MONTH))
 
 #    --output "type=image,push=${PUSH}" \
-
 #    --no-cache \
 #    --load \
+#    --platform "$PLATFORM" \
+#    --output "type=image,push=${PUSH}" \
 
-for distrib in "${DISTRIBUTIONS[@]}"; do
-  docker buildx build \
-    --platform "$PLATFORM" \
-    --build-arg BUILD_VERSION="${VERSION_TAG}" \
+#Inspecting the current docker buildx environment...
+docker context use default
+
+#Inspecting the current docker buildx environment...
+docker buildx inspect --bootstrap default
+
+for OS in "${OSLIST[@]}"; do
+  TAG=djanta/nuxeo-sdk-${OS}:${TAG_ID}
+  docker -D buildx build \
+    --build-arg BUILD_VERSION="${TAG_ID}" \
     --build-arg BUILD_HASH=$(git rev-parse HEAD) \
-    --build-arg RELEASE_VERSION="$(date -u +'%Y.%m.%d')-${distrib}" \
+    --build-arg RELEASE_VERSION="$(date -u +'%Y.%m.%d')-${OS}" \
     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-    --build-arg BUILD_DISTRIB="${distrib}" \
+    --build-arg BUILD_DISTRIB="${OS}" \
     --progress auto \
     --output "type=image,push=${PUSH}" \
-    --tag djanta/nuxeo-sdk:"${VERSION_TAG}-${distrib}" \
-    --file $(pwd)/dockerfiles/${distrib}/Dockerfile ./
+    --tag "${TAG}" \
+    --file "$(pwd)/dockerfiles/${OS}/Dockerfile" ./
 done
 
 #docker buildx prune -f -a --verbose

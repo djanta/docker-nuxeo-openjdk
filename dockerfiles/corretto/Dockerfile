@@ -10,6 +10,7 @@ ARG BUILD_VERSION
 ARG RELEASE_VERSION
 ARG BUILD_DATE
 ARG BUILD_HASH
+ARG BUILD_CCEXTRACTOR_VERSION
 
 LABEL description="DJANTA.IO Nuxeo SDK image share across all our downstream nuxeo LTS customization"
 LABEL version="$RELEASE_VERSION"
@@ -73,7 +74,7 @@ RUN \
   && rm -rf /var/cache/apk/*
 
 ##
-# Specific install for ccextractor for alpine
+# Specific install for ccextractor on alpine
 ##
 RUN \
   apk add \
@@ -115,6 +116,7 @@ RUN \
 #    )
 RUN \
   git clone https://github.com/CCExtractor/ccextractor \
+  && (cd ccextractor/ && git checkout -b feature/${BUILD_CCEXTRACTOR_VERSION:-v0.90} ${BUILD_CCEXTRACTOR_VERSION:-v0.90}) \
   && ( \
       cd ccextractor/linux/ \
       && ./autogen.sh \
