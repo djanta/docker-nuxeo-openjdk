@@ -1,6 +1,6 @@
 # vim:set ft=dockerfile:
 
-FROM centos:7
+FROM centos:8
 
 # Declaring expected external variable
 ARG BUILD_VERSION
