@@ -99,7 +99,6 @@ jobs:
             --build-arg RELEASE_VERSION="$(date -u +'%Y.%m.%d')-${OS}" \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg BUILD_DISTRIB="${OS}" \
-            --build-arg BUILD_DIST_VERSION="7" \
             --progress auto \
             --tag "${TAGS}"
 
