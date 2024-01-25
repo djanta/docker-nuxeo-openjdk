@@ -19,9 +19,9 @@ name: Pull Request
 on:
   push:
     branches:
-      - feature/*
-      - upgrade/*
-      - addon/*
+      - xxfeature/*
+      - xxupgrade/*
+      - xxaddon/*
 jobs:
   build:
     runs-on: ubuntu-latest
